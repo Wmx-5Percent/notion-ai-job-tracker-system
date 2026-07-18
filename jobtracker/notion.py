@@ -45,7 +45,7 @@ def _jd_to_blocks(job_description: str) -> list:
     return blocks
 
 
-def create_job_page(notion, database_id: str, job: dict) -> dict:
+def create_job_page(notion, data_source_id: str, job: dict) -> dict:
     """Create one job row. `job` supports keys: title (required), company,
     company_type, status, url, job_description."""
     properties = {
@@ -63,7 +63,7 @@ def create_job_page(notion, database_id: str, job: dict) -> dict:
     children = _jd_to_blocks(job["job_description"]) if job.get("job_description") else []
 
     return notion.pages.create(
-        parent={"database_id": database_id},
+        parent={"type": "data_source_id", "data_source_id": data_source_id},
         properties=properties,
         children=children,
     )

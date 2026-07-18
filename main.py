@@ -8,7 +8,7 @@ Default target is the SANDBOX database. Pass --prod for the real tracker.
 
 import argparse
 
-from jobtracker.config import get_notion_client, resolve_database
+from jobtracker.config import get_data_source_id, get_notion_client, resolve_database
 from jobtracker.notion import create_job_page
 
 
@@ -42,11 +42,13 @@ def main() -> None:
 
     notion = get_notion_client()
     database_id, label = resolve_database(use_prod=args.prod)
+    data_source_id = get_data_source_id(notion, database_id)
 
     print(f"=== Target database: {label} ===")
-    print(f"    {database_id}")
+    print(f"    db={database_id}")
+    print(f"    ds={data_source_id}")
 
-    page = create_job_page(notion, database_id, build_test_job())
+    page = create_job_page(notion, data_source_id, build_test_job())
     print("\nCreated test job page:")
     print("  ", page.get("url"))
 

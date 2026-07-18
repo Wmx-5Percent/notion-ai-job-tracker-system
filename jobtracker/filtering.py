@@ -4,9 +4,10 @@ Goal: catch every plausible US (or Remote) internship / student / early-career
 role in our target fields, and drop clear full-time, senior, or off-field noise.
 Recall first; leftover noise is triaged with `Skip` in Notion.
 
-The recall gate reads the title AND the job description, so a role whose only
-intern/student signal lives in the JD (e.g. a "which intern season?" question)
-is still caught. Rejects (senior / off-field) read the title only.
+The recall gate reads the title (broad intern/student words) and the JD (only
+strict phrases like "currently pursuing a degree" / "which intern season"), so a
+role whose signal lives only in the JD is still caught, without a full-time JD
+that merely mentions "interns" in passing leaking in. Rejects read the title only.
 """
 
 import re
@@ -130,10 +131,21 @@ def is_internship(title: str) -> bool:
     return bool(_INTERN.search(title or ""))
 
 
-def has_early_career_signal(text: str) -> bool:
-    """Any internship / student / early-career signal, in the title OR the JD."""
-    t = text or ""
-    return bool(_EARLY_CAREER.search(t) or _ELIGIBILITY.search(t))
+def has_early_career_signal(title: str, jd: str = "") -> bool:
+    """Early-career signal: a broad word in the TITLE, or a strict intern-specific
+    phrase in the title / JD.
+
+    Broad words (intern / student / university / campus) are matched on the TITLE
+    only; a full-time JD that mentions "interns" or "universities" in passing must
+    not qualify. The JD counts only via the strict _ELIGIBILITY phrases (e.g.
+    "currently pursuing a degree", "which intern season").
+    """
+    title = title or ""
+    return bool(
+        _EARLY_CAREER.search(title)
+        or _ELIGIBILITY.search(title)
+        or _ELIGIBILITY.search(jd or "")
+    )
 
 
 def is_senior_or_fulltime(title: str) -> bool:
@@ -194,7 +206,7 @@ def match(job: dict) -> str | None:
     Rejects (senior / off-field / PhD-only / off-cycle) read the title only.
     """
     title = job.get("title", "")
-    gate_text = f"{title}\n{job.get('job_description', '') or ''}"
+    jd = job.get("job_description", "") or ""
 
     if not is_us_or_remote(job.get("location", "")):
         return None
@@ -207,6 +219,6 @@ def match(job: dict) -> str | None:
     track = classify_track(title)
     if track is None and is_off_field(title):
         return None
-    if not has_early_career_signal(gate_text):
+    if not has_early_career_signal(title, jd):
         return None
     return track or "Other"

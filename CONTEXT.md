@@ -19,3 +19,7 @@ _Avoid_: Platform, Channel, Board
 **External Job ID（外部职位号）**:
 ATS 为一个职位分配的稳定标识。它与 `Source` 组成 Job Posting 的唯一键，用于去重。
 _Avoid_: Job ID, Posting ID
+
+**Track（方向）**:
+一条 Job Posting 的岗位方向分类：`AI/LLM` · `Data` · `MLE` · `SWE`。v1 由标题关键词粗分，后续可用 LLM 校正。
+_Avoid_: Category, Role Type, 类别

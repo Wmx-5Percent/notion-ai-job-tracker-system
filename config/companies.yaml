@@ -51,7 +51,29 @@ greenhouse:
   # Quant / trading firms with Greenhouse-hosted or Greenhouse-backed job flows
   - optiverus
 
+  # Candidate batch (added 2026-07-18; validated live, 404s removed)
+  - sambanovasystems
+  - mongodb
+  - elastic
+  - cockroachlabs
+  - fivetran
+  - temporaltechnologies
+  - grafanalabs
+  - nuro
+  - stripe
+  - airbnb
+  - lyft
+  - marqeta
+  - mercury
+  - faire
+  - nextdoor
+  - abnormalsecurity
+
 # Not on Greenhouse (404: wrong token or other ATS) — revisit via Lever/Ashby later:
 # doordash, ramp, plaid, benchling, runwayml, genies, appliedintuition, hudsonrivertrading
 # Valid board but 0 open jobs right now (kept): duolingounirecruitment
 # Note: andurilindustries is valid but huge (~2165 jobs) -> slow fetch.
+# 2026-07-18 candidates that 404'd (likely Ashby/Lever or wrong token): cohere, perplexityai,
+# glean, harvey, sierra, writer, contextualai, cerebras, groq, snowflake, confluent, hashicorp,
+# dbtlabs, sourcegraph, cruise, auroraoperations, skydio, shieldai, zipline, whatnot, rippling,
+# deel, crowdstrike, snyk, wiz

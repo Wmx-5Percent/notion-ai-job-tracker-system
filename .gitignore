@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment / secrets — NEVER commit your real token
+.env
+.env.local
+
+# OS
+.DS_Store
+
+# Logs / local data
+*.log
+data/
+
+# Personal job-search material (keep OUT of this code repo)
+resume/
+ChatGPT-*.md

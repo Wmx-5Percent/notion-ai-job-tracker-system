@@ -36,7 +36,9 @@ greenhouse:
   - gruve
 
   # Autonomous systems / robotics / physical AI
-  - andurilindustries
+  # Defense contractors skipped: clearance / US-citizenship requirements make them
+  # a dead end for an international student (and Anduril is a huge ~2165-job board).
+  # - andurilindustries   # Anduril (defense)
   - via
 
   # FinTech / marketplaces / high-scale software
@@ -77,8 +79,8 @@ greenhouse:
   - cruise
   - nuro
   - auroraoperations
-  - skydio
-  - shieldai
+  # - skydio      # defense / dual-use (clearance) -> skip
+  # - shieldai    # Shield AI (defense) -> skip
   - flyzipline
   - stripe
   - airbnb
@@ -105,4 +107,5 @@ greenhouse:
 #   snowflake, cerebras, groq, snyk, hashicorp (official/other).
 # Off-Greenhouse, not listed: ramp, plaid, benchling, runwayml, genies, appliedintuition, hudsonrivertrading.
 # Valid board, 0 open jobs now (kept): duolingounirecruitment, dbtlabsinc.
-# andurilindustries is valid but huge (~2165 jobs) -> slow fetch.
+# Defense contractors intentionally removed (clearance / citizenship bar an intl student):
+#   andurilindustries (Anduril; also a huge ~2165-job board), shieldai (Shield AI), skydio.

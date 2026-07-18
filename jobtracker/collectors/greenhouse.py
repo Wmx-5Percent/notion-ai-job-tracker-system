@@ -16,7 +16,7 @@ _JOBS_URL = "https://boards-api.greenhouse.io/v1/boards/{token}/jobs"
 _JOB_URL = "https://boards-api.greenhouse.io/v1/boards/{token}/jobs/{job_id}"
 
 
-def fetch_jobs(token: str, timeout: float = 20.0) -> list[dict]:
+def fetch_jobs(token: str, timeout: float = 60.0) -> list[dict]:
     """List all jobs for one board token WITHOUT descriptions (fast).
 
     Returns [] if the token is invalid (404) or has no jobs. Raises on other

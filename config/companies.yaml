@@ -2,6 +2,7 @@
 # The collector validates these live; invalid/empty ones are skipped automatically.
 # This is a seed list — grow it over time (coverage = how many companies are here).
 greenhouse:
+  # Existing seed companies
   - anthropic
   - databricks
   - discord
@@ -19,5 +20,38 @@ greenhouse:
   - pinterest
   - dropbox
 
-# Not on Greenhouse (returned 404) — revisit via Lever/Ashby collectors later:
-# doordash, ramp, plaid, benchling
+  # Frontier AI / applied AI / ML
+  - scaleai
+  - deepmind
+  - c3iot
+  - togetherai
+  - xairatherapeutics
+
+  # AI infrastructure / data / developer platforms
+  - datadog
+  - vercel
+  - neo4j
+  - wekatest
+  - zoominfo
+  - gruve
+
+  # Autonomous systems / robotics / physical AI
+  - andurilindustries
+  - via
+
+  # FinTech / marketplaces / high-scale software
+  - chime
+  - flexport
+  - charliehealth
+  - kargo22
+
+  # Early-career / internship-specific boards
+  - duolingounirecruitment
+
+  # Quant / trading firms with Greenhouse-hosted or Greenhouse-backed job flows
+  - optiverus
+
+# Not on Greenhouse (404: wrong token or other ATS) — revisit via Lever/Ashby later:
+# doordash, ramp, plaid, benchling, runwayml, genies, appliedintuition, hudsonrivertrading
+# Valid board but 0 open jobs right now (kept): duolingounirecruitment
+# Note: andurilindustries is valid but huge (~2165 jobs) -> slow fetch.

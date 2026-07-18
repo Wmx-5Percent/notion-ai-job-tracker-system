@@ -16,6 +16,14 @@ _Avoid_: Submission, 投递记录
 一条 Job Posting 来自哪个 ATS 数据源（如 `greenhouse` / `lever` / `ashby`）。
 _Avoid_: Platform, Channel, Board
 
+**Collector（采集器）**:
+从一个 Source 发现 Job Posting 的适配器，实现统一的 `fetch_jobs()` 接口（见 `jobtracker/collectors/base.py`）。每个 Source（Greenhouse / Ashby / …，以后也可能是官网爬虫）是一个独立 Collector，在 registry 里加一行即可接入，互不影响。
+_Avoid_: Scraper, Fetcher, Client
+
+**Sink（写出口）**:
+collect 流水线把一条新的 Job Posting 交给 Sink 落地：生产环境写入 Notion，测试用假 Sink 捕获。它是「写」这一侧的 seam。
+_Avoid_: Writer, Repository
+
 **External Job ID（外部职位号）**:
 ATS 为一个职位分配的稳定标识。它与 `Source` 组成 Job Posting 的唯一键，用于去重。
 _Avoid_: Job ID, Posting ID

@@ -22,7 +22,7 @@ def main() -> None:
     valid, invalid, total = [], [], 0
     for token in tokens:
         try:
-            jobs = greenhouse.fetch_jobs(token)
+            jobs = greenhouse.fetch_board(token)
         except Exception as exc:  # noqa: BLE001 - report and continue
             print(f"  [error] {token}: {exc}")
             invalid.append(token)

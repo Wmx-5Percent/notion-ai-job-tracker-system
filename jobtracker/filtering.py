@@ -12,6 +12,8 @@ that merely mentions "interns" in passing leaking in. Rejects read the title onl
 
 import re
 
+from jobtracker.models import JobPosting
+
 # Strong internship signal (title): intern / internship / co-op.
 _INTERN = re.compile(r"\b(interns?|internship|co-?op|coop)\b", re.I)
 
@@ -197,7 +199,7 @@ def classify_track(title: str) -> str | None:
     return None
 
 
-def match(job: dict) -> str | None:
+def match(job: JobPosting) -> str | None:
     """Return a Track if the job is a plausible US Summer-2027 early-career role
     in our fields, else None.
 

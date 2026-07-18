@@ -26,7 +26,7 @@ def main() -> None:
 
     for token in load_companies().get("greenhouse", []):
         try:
-            jobs = greenhouse.fetch_jobs(token)
+            jobs = greenhouse.fetch_board(token)
         except Exception as exc:  # noqa: BLE001
             print(f"[error] {token}: {type(exc).__name__}")
             continue

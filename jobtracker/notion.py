@@ -9,6 +9,8 @@ This is reused by every collector later (Greenhouse / Lever / Ashby / ...).
 
 from typing import cast
 
+from jobtracker.models import JobPosting
+
 # Notion allows at most 2000 characters per rich_text object; stay under it.
 _MAX_TEXT_LEN = 1900
 
@@ -47,19 +49,16 @@ def _jd_to_blocks(job_description: str) -> list:
     return blocks
 
 
-def create_job_page(notion, data_source_id: str, job: dict) -> dict:
-    """Create one job row. `job` supports keys: title (required), company,
-    company_type, status, url, source, external_job_id, location, posted_date,
-    track, job_description."""
+def create_job_page(notion, data_source_id: str, job: JobPosting) -> dict:
+    """Create one job row. `job` supports keys: title (required), company, status,
+    url, source, external_job_id, location, posted_date, track, job_description."""
     properties: dict = {
         "Job Title": {"title": _rich_text(job["title"])},
     }
     if job.get("company"):
         properties["Company"] = {"rich_text": _rich_text(job["company"])}
-    if job.get("company_type"):
-        properties["Company Type"] = {"rich_text": _rich_text(job["company_type"])}
-    if job.get("status"):
-        properties["Application Status"] = {"status": {"name": job["status"]}}
+    if status := job.get("status"):
+        properties["Application Status"] = {"status": {"name": status}}
     if job.get("url"):
         properties["URL"] = {"url": job["url"]}
     if job.get("source"):
@@ -70,8 +69,8 @@ def create_job_page(notion, data_source_id: str, job: dict) -> dict:
         properties["Location"] = {"rich_text": _rich_text(job["location"])}
     if job.get("posted_date"):
         properties["Posted Date"] = {"date": {"start": job["posted_date"]}}
-    if job.get("track"):
-        properties["Track"] = {"select": {"name": job["track"]}}
+    if track := job.get("track"):
+        properties["Track"] = {"select": {"name": track}}
 
     children = _jd_to_blocks(job["job_description"]) if job.get("job_description") else []
 

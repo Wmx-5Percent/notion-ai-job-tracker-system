@@ -1,30 +1,22 @@
-"""Collector entry point: fetch Greenhouse jobs, filter, dedup, write New rows.
+"""Entry point: collect Job Postings from every configured Source into Notion.
 
     python main.py --dry-run       # sandbox: print what WOULD be created (no writes)
     python main.py --limit 5       # sandbox: create at most 5 new rows
     python main.py                 # sandbox: create all new matching rows
     python main.py --prod          # production (real tracker)
+
+This file is wiring only: resolve the Notion target, build the Source registry,
+and run the collect pipeline. Discovery lives in the Collectors; the fetch ->
+filter -> dedup -> write flow lives in jobtracker.pipeline.
 """
 
 import argparse
 
-from jobtracker import filtering
-from jobtracker.collectors import greenhouse
-from jobtracker.config import (
-    get_data_source_id,
-    get_notion_client,
-    load_companies,
-    resolve_database,
-)
+from jobtracker import pipeline
+from jobtracker.collectors.registry import build_registry
+from jobtracker.config import get_data_source_id, get_notion_client, resolve_database
+from jobtracker.models import JobPosting
 from jobtracker.notion import create_job_page, existing_keys
-
-
-def _summary(created: int, dup: int, filtered: int, errors: int, dry_run: bool) -> None:
-    verb = "would create" if dry_run else "created"
-    print(
-        f"\n{verb}: {created} | dup-skipped: {dup} | "
-        f"filtered-out: {filtered} | company-errors: {errors}"
-    )
 
 
 def main() -> None:
@@ -47,36 +39,23 @@ def main() -> None:
     seen = existing_keys(notion, data_source_id)
     print(f"Existing (Source, External Job ID) keys: {len(seen)}\n")
 
-    created = dup = filtered = errors = 0
-    for token in load_companies().get("greenhouse", []):
-        try:
-            jobs = greenhouse.fetch_jobs(token)
-        except Exception as exc:  # noqa: BLE001 - report and continue
-            print(f"  [error] {token}: {exc}")
-            errors += 1
-            continue
-        for job in jobs:
-            track = filtering.match(job)
-            if not track:
-                filtered += 1
-                continue
-            key = (job["source"], job["external_job_id"])
-            if key in seen:
-                dup += 1
-                continue
-            seen.add(key)
-            job["track"] = track
-            job["status"] = "New"
-            print(f"  + [{track:6}] {token}: {job['title']}  ({job['location']})")
-            if not args.dry_run:
-                create_job_page(notion, data_source_id, job)
-            created += 1
-            if args.limit and created >= args.limit:
-                print("  (reached --limit)")
-                _summary(created, dup, filtered, errors, args.dry_run)
-                return
+    def sink(job: JobPosting) -> None:
+        print(
+            f"  + [{job.get('track', ''):6}] {job['source']}:{job['company']}: "
+            f"{job['title']}  ({job['location']})"
+        )
+        if not args.dry_run:
+            create_job_page(notion, data_source_id, job)
 
-    _summary(created, dup, filtered, errors, args.dry_run)
+    result = pipeline.collect(build_registry(), seen, sink, limit=args.limit)
+    if args.limit and result.created >= args.limit:
+        print("  (reached --limit)")
+
+    verb = "would create" if args.dry_run else "created"
+    print(
+        f"\n{verb}: {result.created} | dup-skipped: {result.dup} | "
+        f"filtered-out: {result.filtered}"
+    )
 
 
 if __name__ == "__main__":

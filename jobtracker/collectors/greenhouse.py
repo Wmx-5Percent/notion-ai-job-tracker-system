@@ -1,25 +1,46 @@
-"""Greenhouse collector: list a company's public board jobs, each WITH its full
-description, in a single request.
+"""Greenhouse Collector: fetch every configured board's jobs, each WITH its full
+description, in one request per board (?content=true).
 
-    GET .../boards/<token>/jobs?content=true   -> all jobs, WITH descriptions
-    GET .../boards/<token>/jobs/<id>           -> one job WITH its description
+    GET .../boards/<token>/jobs?content=true   -> all of a board's jobs, WITH JDs
 
-`content=true` returns every job's JD in one call, so the filter can read the JD
-(not just the title) and still catch student roles whose only intern signal lives
-in the description. `fetch_description` remains for fetching a single job on demand.
+`content=true` returns every job's JD in a single call, so the filter can read
+the JD (not just the title) and still catch student roles whose only intern
+signal lives in the description.
 """
 
 import html
 import re
+from typing import Iterator
 
 import httpx
 
+from jobtracker.models import JobPosting
+
 _JOBS_URL = "https://boards-api.greenhouse.io/v1/boards/{token}/jobs"
-_JOB_URL = "https://boards-api.greenhouse.io/v1/boards/{token}/jobs/{job_id}"
 
 
-def fetch_jobs(token: str, timeout: float = 60.0) -> list[dict]:
-    """List all jobs for one board token WITH their descriptions, in one request.
+class GreenhouseCollector:
+    """Collector adapter for Greenhouse public boards.
+
+    Holds the board tokens it is responsible for; a bad or empty board is logged
+    and skipped so one dead token never stops the run.
+    """
+
+    source = "greenhouse"
+
+    def __init__(self, tokens: list[str]) -> None:
+        self._tokens = tokens
+
+    def fetch_jobs(self) -> Iterator[JobPosting]:
+        for token in self._tokens:
+            try:
+                yield from fetch_board(token)
+            except Exception as exc:  # noqa: BLE001 - skip a bad board, keep going
+                print(f"  [error] greenhouse:{token}: {exc}")
+
+
+def fetch_board(token: str, timeout: float = 60.0) -> list[JobPosting]:
+    """Fetch one board's jobs WITH descriptions (?content=true).
 
     Returns [] if the token is invalid (404) or has no jobs. Raises on other
     HTTP/network errors so the caller can decide how to handle them.
@@ -30,18 +51,10 @@ def fetch_jobs(token: str, timeout: float = 60.0) -> list[dict]:
     if resp.status_code == 404:
         return []
     resp.raise_for_status()
-    jobs = resp.json().get("jobs", [])
-    return [_normalize(token, job) for job in jobs]
+    return [_normalize(token, job) for job in resp.json().get("jobs", [])]
 
 
-def fetch_description(token: str, job_id: str, timeout: float = 20.0) -> str:
-    """Fetch one job's full description as plain text (call only for kept jobs)."""
-    resp = httpx.get(_JOB_URL.format(token=token, job_id=job_id), timeout=timeout)
-    resp.raise_for_status()
-    return _html_to_text(resp.json().get("content") or "")
-
-
-def _normalize(token: str, job: dict) -> dict:
+def _normalize(token: str, job: dict) -> JobPosting:
     """Map a raw Greenhouse job into our normalized Job Posting dict."""
     location = job.get("location") or {}
     updated = job.get("updated_at") or ""

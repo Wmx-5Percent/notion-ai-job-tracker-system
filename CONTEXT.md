@@ -11,3 +11,11 @@ _Avoid_: Job, Listing, Opportunity, 岗位, 职位
 **Application（申请）**:
 同一条 Job Posting 进入「已投递及之后」的阶段。它不是单独的记录，而是该行生命周期的后半段（投递 → OA → 面试 → 结果）。
 _Avoid_: Submission, 投递记录
+
+**Source（来源）**:
+一条 Job Posting 来自哪个 ATS 数据源（如 `greenhouse` / `lever` / `ashby`）。
+_Avoid_: Platform, Channel, Board
+
+**External Job ID（外部职位号）**:
+ATS 为一个职位分配的稳定标识。它与 `Source` 组成 Job Posting 的唯一键，用于去重。
+_Avoid_: Job ID, Posting ID

@@ -69,9 +69,6 @@ def main() -> None:
             job["status"] = "New"
             print(f"  + [{track:6}] {token}: {job['title']}  ({job['location']})")
             if not args.dry_run:
-                job["job_description"] = greenhouse.fetch_description(
-                    token, job["external_job_id"]
-                )
                 create_job_page(notion, data_source_id, job)
             created += 1
             if args.limit and created >= args.limit:

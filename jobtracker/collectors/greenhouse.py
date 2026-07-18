@@ -1,10 +1,12 @@
-"""Greenhouse collector: list a company's public board jobs, and (separately)
-fetch a single job's full description.
+"""Greenhouse collector: list a company's public board jobs, each WITH its full
+description, in a single request.
 
-    GET .../boards/<token>/jobs         -> list WITHOUT descriptions (fast)
-    GET .../boards/<token>/jobs/<id>    -> one job WITH its description
+    GET .../boards/<token>/jobs?content=true   -> all jobs, WITH descriptions
+    GET .../boards/<token>/jobs/<id>           -> one job WITH its description
 
-We list first (cheap), filter, then fetch descriptions only for kept jobs.
+`content=true` returns every job's JD in one call, so the filter can read the JD
+(not just the title) and still catch student roles whose only intern signal lives
+in the description. `fetch_description` remains for fetching a single job on demand.
 """
 
 import html
@@ -17,12 +19,14 @@ _JOB_URL = "https://boards-api.greenhouse.io/v1/boards/{token}/jobs/{job_id}"
 
 
 def fetch_jobs(token: str, timeout: float = 60.0) -> list[dict]:
-    """List all jobs for one board token WITHOUT descriptions (fast).
+    """List all jobs for one board token WITH their descriptions, in one request.
 
     Returns [] if the token is invalid (404) or has no jobs. Raises on other
     HTTP/network errors so the caller can decide how to handle them.
     """
-    resp = httpx.get(_JOBS_URL.format(token=token), timeout=timeout)
+    resp = httpx.get(
+        _JOBS_URL.format(token=token), params={"content": "true"}, timeout=timeout
+    )
     if resp.status_code == 404:
         return []
     resp.raise_for_status()
@@ -49,7 +53,7 @@ def _normalize(token: str, job: dict) -> dict:
         "location": (location.get("name") or "").strip(),
         "url": job.get("absolute_url") or "",
         "posted_date": updated[:10] or None,  # YYYY-MM-DD
-        "job_description": "",  # filled later via fetch_description for kept jobs
+        "job_description": _html_to_text(job.get("content") or ""),
     }
 
 

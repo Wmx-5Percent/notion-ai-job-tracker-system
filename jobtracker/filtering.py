@@ -1,13 +1,72 @@
 """High-recall filtering + rough Track classification for Job Postings (ADR-0004).
 
-Hard constraints: a job must be an internship AND in the US or Remote.
-Role match: if the title hits any target-track keyword, keep it and assign a
-Track. High recall on purpose — noise is triaged away later with `Skip`.
+Goal: catch every plausible US (or Remote) internship / student / early-career
+role in our target fields, and drop clear full-time, senior, or off-field noise.
+Recall first; leftover noise is triaged with `Skip` in Notion.
+
+The recall gate reads the title AND the job description, so a role whose only
+intern/student signal lives in the JD (e.g. a "which intern season?" question)
+is still caught. Rejects (senior / off-field) read the title only.
 """
 
 import re
 
-_INTERN = re.compile(r"\b(intern|interns|internship|co-?op)\b", re.I)
+# Strong internship signal (title): intern / internship / co-op.
+_INTERN = re.compile(r"\b(interns?|internship|co-?op|coop)\b", re.I)
+
+# Broad early-career gate: strong intern signals + student / early-career words.
+# Matched against title + JD, so JD-only student roles are still caught.
+_EARLY_CAREER = re.compile(
+    r"\b(interns?|internship|co-?op|coop)\b"
+    r"|\bstudent\b|\buniversity\b|\bcampus\b"
+    r"|\bapprentice(ship)?\b|\btrainee\b"
+    r"|\bsummer\s+(analyst|associate|scholar)\b"
+    r"|\bworking\s+student\b|\bstudent\s+worker\b"
+    r"|\bearly[-\s]?career\b"
+    r"|\b(ai|ml|research|data|software)\s+resident\b|\bresidency\b"
+    r"|\bindustrial\s+placement\b|\bplacement\s+year\b",
+    re.I,
+)
+
+# JD-only eligibility signals: the title lacks an intern/student word but the
+# description reveals a student program (the Neuralink "which season?" case).
+# Kept deliberately narrow: generic phrases ("enrolled in", "graduation date",
+# "summer 2027", "10 weeks") also appear in full-time JDs and cause false keeps.
+_ELIGIBILITY = re.compile(
+    r"currently\s+pursuing\s+(a|an|your)?\s*(bachelor|master|b\.?s\.?|m\.?s\.?|undergraduate|graduate\s+degree)"
+    r"|rising\s+(sophomore|junior|senior)"
+    r"|return(ing)?\s+to\s+(school|campus|university)"
+    r"|intern(ship)?\s+(season|cohort)"
+    r"|(which|what)\s+(intern(ship)?\s+)?season",
+    re.I,
+)
+
+# Full-time / seniority markers (title only): not a Summer-2027 internship.
+_SENIOR = re.compile(
+    r"\bsenior\b|\bsr\.?\b|\bstaff\b|\bprincipal\b|\blead\b|\bmanager\b|\bdirector\b"
+    r"|\bvp\b|\bvice\s+president\b|\bhead\s+of\b|\bdistinguished\b|\bfellow\b"
+    r"|\bnew\s+(college\s+)?grad(uate)?\b|\brecent\s+(college\s+)?graduate\b",
+    re.I,
+)
+
+# "Graduate <role>" (e.g. "Graduate Software Engineer, 2027 start") is a new-grad
+# full-time program, not an internship. Reject bare "graduate" unless the title
+# also carries an intern / student / research word.
+_GRADUATE = re.compile(r"\bgraduate\b", re.I)
+_STUDENTISH = re.compile(r"\b(interns?|internship|co-?op|coop|student|research|ph\.?d)\b", re.I)
+
+# Off-field role functions (title only). Only rejects when NO target-track
+# keyword is present, so "Data Analyst Intern, Finance" (a Data role) survives.
+_OFF_FIELD = re.compile(
+    r"\brecruit(er|ing|ment)?\b|\bsales\b|\baccount\s+(executive|development|manager)\b"
+    r"|\b(business|sales)\s+development\b|\b(sdr|bdr)\b|\brepresentative\b"
+    r"|\bmarketing\b|\bhuman\s+resources\b|\bhr\b|\bpeople\s+operations\b|\btalent\b"
+    r"|\bfinance\b|\bfinancial\b|\baccounting\b|\blegal\b|\bcounsel\b|\bparalegal\b"
+    r"|\bcommunications\b|\bpublic\s+relations\b|\bsupply\s+chain\b|\bprocurement\b"
+    r"|\bcustomer\s+success\b|\bclinical\b|\bphysician\b|\bnurse\b|\bmechanical\b"
+    r"|\belectrical\b|\bhardware\b|\bfirmware\b",
+    re.I,
+)
 
 # Degree ineligibility: PhD-only roles (user is an incoming MS student). Kept if
 # the title also welcomes Master's / MS.
@@ -21,8 +80,23 @@ _OFFCYCLE = re.compile(
     re.I,
 )
 
-# US / Remote signals in a location string.
-_US_TEXT = re.compile(r"united states|u\.?s\.?a?\.?\b|\bus\b|remote", re.I)
+# US / Remote signals in a location string. "remote" alone is treated as US only
+# when no non-US locale is named (see is_us_or_remote), so "Remote - Germany" is
+# not mistaken for a US role.
+_US_TEXT = re.compile(r"united states|u\.?s\.?a?\.?\b|\bus\b", re.I)
+_REMOTE = re.compile(r"\bremote\b", re.I)
+_NON_US = re.compile(
+    r"\b("
+    r"netherlands|germany|deutschland|united\s+kingdom|england|scotland|ireland|"
+    r"france|spain|portugal|italy|poland|sweden|norway|denmark|finland|switzerland|"
+    r"austria|belgium|luxembourg|czechia|romania|hungary|greece|"
+    r"canada|brazil|argentina|colombia|chile|"
+    r"india|china|japan|korea|singapore|australia|new\s+zealand|"
+    r"israel|turkey|uae|dubai|egypt|nigeria|kenya|south\s+africa|"
+    r"benelux|dach|emea|apac|latam|europe|asia|uk|eu"
+    r")\b",
+    re.I,
+)
 _US_STATES = (
     "AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO "
     "MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY DC"
@@ -52,7 +126,31 @@ _TRACKS = [(name, re.compile(pat, re.I)) for name, pat in _TRACK_PATTERNS]
 
 
 def is_internship(title: str) -> bool:
+    """Strong internship signal in the title (intern / co-op)."""
     return bool(_INTERN.search(title or ""))
+
+
+def has_early_career_signal(text: str) -> bool:
+    """Any internship / student / early-career signal, in the title OR the JD."""
+    t = text or ""
+    return bool(_EARLY_CAREER.search(t) or _ELIGIBILITY.search(t))
+
+
+def is_senior_or_fulltime(title: str) -> bool:
+    """Seniority / full-time markers that rule out a Summer-2027 internship.
+
+    Also rejects new-grad "graduate" programs (e.g. "Graduate Software Engineer,
+    2027 start") unless the title also carries an intern / student word.
+    """
+    t = title or ""
+    if _SENIOR.search(t):
+        return True
+    return bool(_GRADUATE.search(t) and not _STUDENTISH.search(t))
+
+
+def is_off_field(title: str) -> bool:
+    """A clearly non-technical role function (sales / HR / finance / ...)."""
+    return bool(_OFF_FIELD.search(title or ""))
 
 
 def is_phd_only(title: str) -> bool:
@@ -67,8 +165,16 @@ def is_offcycle(title: str) -> bool:
 
 
 def is_us_or_remote(location: str) -> bool:
+    """US location, or remote that is not tied to a non-US locale.
+
+    A US state / "United States" / "US" always qualifies (so a multi-location
+    posting that includes a US site is kept). Bare "remote" qualifies only when
+    no non-US country/region is named (so "Remote - Germany" is dropped).
+    """
     loc = location or ""
-    return bool(_US_TEXT.search(loc) or _US_STATE.search(loc) or _US_STATE_NAME.search(loc))
+    if _US_TEXT.search(loc) or _US_STATE.search(loc) or _US_STATE_NAME.search(loc):
+        return True
+    return bool(_REMOTE.search(loc) and not _NON_US.search(loc))
 
 
 def classify_track(title: str) -> str | None:
@@ -80,18 +186,27 @@ def classify_track(title: str) -> str | None:
 
 
 def match(job: dict) -> str | None:
-    """Return the Track if the job passes every filter, else None.
+    """Return a Track if the job is a plausible US Summer-2027 early-career role
+    in our fields, else None.
 
-    Hard constraints: internship, not PhD-only, not an off-cycle (non-summer)
-    season, and US/Remote.
+    High recall: the early-career gate reads title + job description, and an
+    in-field role we cannot classify is kept as `Other` for manual triage.
+    Rejects (senior / off-field / PhD-only / off-cycle) read the title only.
     """
     title = job.get("title", "")
-    if not is_internship(title):
+    gate_text = f"{title}\n{job.get('job_description', '') or ''}"
+
+    if not is_us_or_remote(job.get("location", "")):
+        return None
+    if is_senior_or_fulltime(title):
         return None
     if is_phd_only(title):
         return None
     if is_offcycle(title):
         return None
-    if not is_us_or_remote(job.get("location", "")):
+    track = classify_track(title)
+    if track is None and is_off_field(title):
         return None
-    return classify_track(title)
+    if not has_early_career_signal(gate_text):
+        return None
+    return track or "Other"

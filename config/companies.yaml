@@ -51,7 +51,7 @@ greenhouse:
   # Quant / trading firms with Greenhouse-hosted or Greenhouse-backed job flows
   - optiverus
 
-  # Candidate batch (added 2026-07-18; validated live, 404s removed)
+  # Candidate batch (added 2026-07-18; validated live)
   - sambanovasystems
   - mongodb
   - elastic
@@ -69,11 +69,22 @@ greenhouse:
   - nextdoor
   - abnormalsecurity
 
-# Not on Greenhouse (404: wrong token or other ATS) — revisit via Lever/Ashby later:
-# doordash, ramp, plaid, benchling, runwayml, genies, appliedintuition, hudsonrivertrading
-# Valid board but 0 open jobs right now (kept): duolingounirecruitment
-# Note: andurilindustries is valid but huge (~2165 jobs) -> slow fetch.
-# 2026-07-18 candidates that 404'd (likely Ashby/Lever or wrong token): cohere, perplexityai,
-# glean, harvey, sierra, writer, contextualai, cerebras, groq, snowflake, confluent, hashicorp,
-# dbtlabs, sourcegraph, cruise, auroraoperations, skydio, shieldai, zipline, whatnot, rippling,
-# deel, crowdstrike, snyk, wiz
+  # Recovered under corrected slugs (2026-07-18)
+  - wizinc       # was "wiz" (144 jobs)
+  - flyzipline   # was "zipline" (131 jobs)
+  - gleanwork    # was "glean" (124 jobs)
+  - dbtlabsinc   # was "dbtlabs" (valid, 0 jobs now)
+
+# ---------------------------------------------------------------------------
+# NOT on Greenhouse under obvious slugs (confirmed 404) -> these use Ashby / Lever
+# / Workday. Kept here as a TODO for the future Lever/Ashby collectors (NOT deleted,
+# so we don't lose the company; a wrong Greenhouse slug can never return jobs):
+#   snowflake, groq, cruise, confluent, cohere, perplexityai, writer, cerebras,
+#   sourcegraph, hashicorp, crowdstrike, snyk, deel, rippling, skydio, harvey,
+#   sierra, contextualai, whatnot, runwayml, genies, appliedintuition,
+#   doordash, ramp, plaid, benchling, hudsonrivertrading
+# Recovered under corrected slugs (now active above): wiz->wizinc,
+#   zipline->flyzipline, glean->gleanwork, dbtlabs->dbtlabsinc
+# Valid boards with 0 open jobs now (kept active): duolingounirecruitment, dbtlabsinc
+# andurilindustries is valid but huge (~2165 jobs) -> slow fetch.
+# ---------------------------------------------------------------------------

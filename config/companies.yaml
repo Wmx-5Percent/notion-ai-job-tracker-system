@@ -44,6 +44,7 @@ greenhouse:
   - flexport
   - charliehealth
   - kargo22
+  - doordashusa   # DoorDash (Greenhouse token is "doordashusa", not "doordash")
 
   # Early-career / internship-specific boards
   - duolingounirecruitment
@@ -51,40 +52,57 @@ greenhouse:
   # Quant / trading firms with Greenhouse-hosted or Greenhouse-backed job flows
   - optiverus
 
-  # Candidate batch (added 2026-07-18; validated live)
+  # Candidate batch (added 2026-07-18; validated live, 404s pruned)
+  - cohere
+  - perplexityai
+  - gleanwork
+  - harvey
+  - sierra
+  - writer
+  - contextualai
+  - cerebras
+  - groq
   - sambanovasystems
+  - snowflake
+  - confluent
   - mongodb
   - elastic
   - cockroachlabs
+  - hashicorp
+  - dbtlabsinc
   - fivetran
+  - sourcegraph91
   - temporaltechnologies
   - grafanalabs
+  - cruise
   - nuro
+  - auroraoperations
+  - skydio
+  - shieldai
+  - flyzipline
   - stripe
   - airbnb
   - lyft
   - marqeta
   - mercury
   - faire
+  - whatnot
+  - rippling
+  - deel
   - nextdoor
+  - crowdstrike
+  - snyk
+  - wizinc
   - abnormalsecurity
 
-  # Recovered under corrected slugs (2026-07-18)
-  - wizinc       # was "wiz" (144 jobs)
-  - flyzipline   # was "zipline" (131 jobs)
-  - gleanwork    # was "glean" (124 jobs)
-  - dbtlabsinc   # was "dbtlabs" (valid, 0 jobs now)
-
-# ---------------------------------------------------------------------------
-# NOT on Greenhouse under obvious slugs (confirmed 404) -> these use Ashby / Lever
-# / Workday. Kept here as a TODO for the future Lever/Ashby collectors (NOT deleted,
-# so we don't lose the company; a wrong Greenhouse slug can never return jobs):
-#   snowflake, groq, cruise, confluent, cohere, perplexityai, writer, cerebras,
-#   sourcegraph, hashicorp, crowdstrike, snyk, deel, rippling, skydio, harvey,
-#   sierra, contextualai, whatnot, runwayml, genies, appliedintuition,
-#   doordash, ramp, plaid, benchling, hudsonrivertrading
-# Recovered under corrected slugs (now active above): wiz->wizinc,
-#   zipline->flyzipline, glean->gleanwork, dbtlabs->dbtlabsinc
-# Valid boards with 0 open jobs now (kept active): duolingounirecruitment, dbtlabsinc
+# Corrected Greenhouse tokens (token != company name; verified live 2026-07-18):
+#   doordash->doordashusa, sourcegraph->sourcegraph91, dbtlabs->dbtlabsinc,
+#   glean->gleanwork, zipline->flyzipline, wiz->wizinc.
+# Still in the list below but NOT on Greenhouse (need an Ashby/Lever/Workday collector; a
+# token fix will NOT help) -> auto-skipped for now:
+#   cohere, perplexityai, harvey, sierra, writer, contextualai, confluent, deel, cruise,
+#   auroraoperations, skydio, shieldai, whatnot, rippling (Ashby); crowdstrike (Workday);
+#   snowflake, cerebras, groq, snyk, hashicorp (official/other).
+# Off-Greenhouse, not listed: ramp, plaid, benchling, runwayml, genies, appliedintuition, hudsonrivertrading.
+# Valid board, 0 open jobs now (kept): duolingounirecruitment, dbtlabsinc.
 # andurilindustries is valid but huge (~2165 jobs) -> slow fetch.
-# ---------------------------------------------------------------------------

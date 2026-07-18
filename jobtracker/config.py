@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from typing import cast
 
+import yaml
 from dotenv import load_dotenv
 from notion_client import Client
 
@@ -53,3 +54,10 @@ def get_data_source_id(notion: Client, database_id: str) -> str:
     if len(sources) > 1:
         print(f"WARNING: database has {len(sources)} data sources; using the first.")
     return sources[0]["id"]
+
+
+def load_companies() -> dict:
+    """Load config/companies.yaml -> {source: [board tokens]}."""
+    path = _ROOT / "config" / "companies.yaml"
+    with open(path, encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}

@@ -1,0 +1,23 @@
+# Greenhouse board tokens (boards-api.greenhouse.io/v1/boards/<token>/jobs).
+# The collector validates these live; invalid/empty ones are skipped automatically.
+# This is a seed list — grow it over time (coverage = how many companies are here).
+greenhouse:
+  - anthropic
+  - databricks
+  - discord
+  - figma
+  - coinbase
+  - robinhood
+  - instacart
+  - brex
+  - gusto
+  - samsara
+  - affirm
+  - cloudflare
+  - gitlab
+  - reddit
+  - pinterest
+  - dropbox
+
+# Not on Greenhouse (returned 404) — revisit via Lever/Ashby collectors later:
+# doordash, ramp, plaid, benchling

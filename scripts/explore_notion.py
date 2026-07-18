@@ -13,11 +13,13 @@ Nothing is written to Notion here. This is read-only.
 
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
 from notion_client import Client
 
-load_dotenv()
+# Load .env from the project root regardless of the current working directory.
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 token = os.environ.get("NOTION_TOKEN", "").strip()
 if not token:

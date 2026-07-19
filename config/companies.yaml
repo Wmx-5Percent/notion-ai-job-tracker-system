@@ -247,6 +247,18 @@ companies:
   - { name: Whatnot, ats: ashby, id: whatnot }
   - { name: Rippling, ats: ashby, id: rippling }
 
+  # ─────────────── Lever (api.lever.co/v0/postings/<id>?mode=json) ───────────────
+  - { name: Gopuff, ats: lever, id: gopuff }
+  - { name: Spotify, ats: lever, id: spotify }
+  - { name: Kavak, ats: lever, id: kavak }
+  - { name: Brilliant, ats: lever, id: brilliant }
+  - { name: Latch, ats: lever, id: latch }
+  # valid board, no open roles right now (kept):
+  - { name: Clari, ats: lever, id: clari }
+  - { name: Labelbox, ats: lever, id: labelbox }
+  - { name: Mistral AI, ats: lever, id: mistral }
+  - { name: Wealthsimple, ats: lever, id: wealthsimple }
+
 # ─────────────── Parked: need a Collector we haven't built yet ───────────────
 # Kept here so we don't lose them; move into `companies:` when the collector lands.
 #   Workday : CrowdStrike

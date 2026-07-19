@@ -3,6 +3,7 @@ or 5xx does not silently drop a whole company for a run (see companies.yaml poli
 """
 
 import time
+from typing import Any
 
 import httpx
 
@@ -14,7 +15,7 @@ def get_json(
     timeout: float = 30.0,
     retries: int = 2,
     backoff: float = 1.5,
-) -> dict | None:
+) -> Any:
     """GET and parse JSON. Returns None on 404 (board gone).
 
     Retries on timeout / transport error / 5xx (with linear backoff); a non-404

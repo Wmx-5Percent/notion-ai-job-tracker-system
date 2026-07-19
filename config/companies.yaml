@@ -206,6 +206,39 @@ companies:
   - { name: Nudge Security, ats: ashby, id: nudgesecurity }
   - { name: Salesloft, ats: ashby, id: salesloft }
   - { name: Valence, ats: ashby, id: valence }
+  # ─── Expanded batch #2 (discovered live 2026-07-19) ───
+  - { name: Legora, ats: ashby, id: legora }
+  - { name: Encord, ats: ashby, id: encord }
+  - { name: Gamma, ats: ashby, id: gamma }
+  - { name: Cartesia, ats: ashby, id: cartesia }
+  - { name: Dust, ats: ashby, id: dust }
+  - { name: WorkOS, ats: ashby, id: workos }
+  - { name: Generalist, ats: ashby, id: generalist }
+  - { name: Langdock, ats: ashby, id: langdock }
+  - { name: Insitro, ats: ashby, id: insitro }
+  - { name: Relevance AI, ats: ashby, id: relevanceai }
+  - { name: Unify, ats: ashby, id: unify }
+  - { name: Astra, ats: ashby, id: astra }
+  - { name: MotherDuck, ats: ashby, id: motherduck }
+  - { name: Resend, ats: ashby, id: resend }
+  - { name: Aleph Alpha, ats: ashby, id: alephalpha }
+  - { name: Gumloop, ats: ashby, id: gumloop }
+  - { name: Infisical, ats: ashby, id: infisical }
+  - { name: Inkeep, ats: ashby, id: inkeep }
+  - { name: Orum, ats: ashby, id: orum }
+  - { name: Reka, ats: ashby, id: reka }
+  - { name: Genmo, ats: ashby, id: genmo }
+  - { name: Stytch, ats: ashby, id: stytch }
+  - { name: WunderGraph, ats: ashby, id: wundergraph }
+  - { name: Knock, ats: ashby, id: knock }
+  - { name: Doppler, ats: ashby, id: doppler }
+  - { name: Mastra, ats: ashby, id: mastra }
+  - { name: Rutter, ats: ashby, id: rutter }
+  # valid board, no open roles right now (kept):
+  - { name: Clerk, ats: ashby, id: clerk }
+  - { name: Essential AI, ats: ashby, id: essentialai }
+  - { name: Pave, ats: ashby, id: pave }
+  - { name: StrongDM, ats: ashby, id: strongdm }
   # on Ashby per research but the slug still needs confirming (kept; skipped until fixed):
   - { name: Contextual AI, ats: ashby, id: contextual }
   - { name: Confluent, ats: ashby, id: confluent }

@@ -125,6 +125,87 @@ companies:
   - { name: Snyk, ats: ashby, id: snyk }
   - { name: Verkada, ats: ashby, id: verkada }
   - { name: Webflow, ats: ashby, id: webflow }
+  # ─── Expanded batch (discovered live 2026-07-19) ───
+  - { name: Airwallex, ats: ashby, id: airwallex }
+  - { name: Applied Intuition, ats: ashby, id: applied }   # dual-use / defense-adjacent
+  - { name: Form Energy, ats: ashby, id: formenergy }
+  - { name: Wayve, ats: ashby, id: wayve }
+  - { name: Helion, ats: ashby, id: helion }
+  - { name: Etched, ats: ashby, id: etched }
+  - { name: Cognition, ats: ashby, id: cognition }
+  - { name: Synthesia, ats: ashby, id: synthesia }
+  - { name: Mercor, ats: ashby, id: mercor }
+  - { name: 1X, ats: ashby, id: 1x }
+  - { name: Rogo, ats: ashby, id: rogo }
+  - { name: Commure, ats: ashby, id: commure }
+  - { name: ClickUp, ats: ashby, id: clickup }
+  - { name: Benchling, ats: ashby, id: benchling }
+  - { name: Abridge, ats: ashby, id: abridge }
+  - { name: Fireworks AI, ats: ashby, id: fireworksai }
+  - { name: Sardine, ats: ashby, id: sardine }
+  - { name: n8n, ats: ashby, id: n8n }
+  - { name: Standard Bots, ats: ashby, id: standardbots }
+  - { name: Reducto, ats: ashby, id: reducto }
+  - { name: Braintrust, ats: ashby, id: braintrust }
+  - { name: Astronomer, ats: ashby, id: astronomer }
+  - { name: RunPod, ats: ashby, id: runpod }
+  - { name: Socket, ats: ashby, id: socket }
+  - { name: Tennr, ats: ashby, id: tennr }
+  - { name: Omni, ats: ashby, id: omni }
+  - { name: Anyscale, ats: ashby, id: anyscale }
+  - { name: Leapsome, ats: ashby, id: leapsome }
+  - { name: Middesk, ats: ashby, id: middesk }
+  - { name: Mintlify, ats: ashby, id: mintlify }
+  - { name: Krea, ats: ashby, id: krea }
+  - { name: Coder, ats: ashby, id: coder }
+  - { name: Airbyte, ats: ashby, id: airbyte }
+  - { name: LlamaIndex, ats: ashby, id: llamaindex }
+  - { name: Oneleet, ats: ashby, id: oneleet }
+  - { name: Blacksmith, ats: ashby, id: blacksmith }
+  - { name: Chai Discovery, ats: ashby, id: chaidiscovery }
+  - { name: Wayflyer, ats: ashby, id: wayflyer }
+  - { name: Kestra, ats: ashby, id: kestra }
+  - { name: Nabla, ats: ashby, id: nabla }
+  - { name: OpenEvidence, ats: ashby, id: openevidence }
+  - { name: Titan, ats: ashby, id: titan }
+  - { name: Causaly, ats: ashby, id: causaly }
+  - { name: Corti, ats: ashby, id: corti }
+  - { name: LanceDB, ats: ashby, id: lancedb }
+  - { name: Mural, ats: ashby, id: mural }
+  - { name: NetBird, ats: ashby, id: netbird }
+  - { name: LatchBio, ats: ashby, id: latchbio }
+  - { name: Namespace, ats: ashby, id: namespace }
+  - { name: Langfuse, ats: ashby, id: langfuse }
+  - { name: Ideogram, ats: ashby, id: ideogram }
+  - { name: Sweep, ats: ashby, id: sweep }
+  - { name: turbopuffer, ats: ashby, id: turbopuffer }
+  - { name: Unstructured, ats: ashby, id: unstructured }
+  - { name: Sift, ats: ashby, id: sift }
+  - { name: Deepnote, ats: ashby, id: deepnote }
+  - { name: Lightdash, ats: ashby, id: lightdash }
+  - { name: Lorikeet, ats: ashby, id: lorikeet }
+  - { name: Meow, ats: ashby, id: meow }
+  - { name: Nomic, ats: ashby, id: nomic }
+  - { name: Recraft, ats: ashby, id: recraft }
+  - { name: Speakeasy, ats: ashby, id: speakeasy }
+  - { name: Capchase, ats: ashby, id: capchase }
+  - { name: Materialize, ats: ashby, id: materialize }
+  - { name: Runway, ats: ashby, id: runway }
+  - { name: Windmill, ats: ashby, id: windmill }
+  - { name: Anterior, ats: ashby, id: anterior }
+  - { name: Depot, ats: ashby, id: depot }
+  - { name: Zed, ats: ashby, id: zed }
+  - { name: Hightouch, ats: ashby, id: hightouch }
+  - { name: Inngest, ats: ashby, id: inngest }
+  - { name: tldraw, ats: ashby, id: tldraw }
+  - { name: Trigger.dev, ats: ashby, id: triggerdev }
+  - { name: Vellum, ats: ashby, id: vellum }
+  - { name: WarpBuild, ats: ashby, id: warpbuild }
+  # valid board, no open roles right now (kept):
+  - { name: Count, ats: ashby, id: count }
+  - { name: Nudge Security, ats: ashby, id: nudgesecurity }
+  - { name: Salesloft, ats: ashby, id: salesloft }
+  - { name: Valence, ats: ashby, id: valence }
   # on Ashby per research but the slug still needs confirming (kept; skipped until fixed):
   - { name: Contextual AI, ats: ashby, id: contextual }
   - { name: Confluent, ats: ashby, id: confluent }

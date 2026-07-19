@@ -273,8 +273,23 @@ companies:
   - { name: Playco, ats: lever, id: playco }
 
   # ─────────────── Workday (POST cxs API; title-only, the row links out for the JD) ───────────────
+  # `site` is case-insensitive in the CXS API. Each config live-verified (intern search returns 200).
   - { name: NVIDIA, ats: workday, id: { host: nvidia.wd5, tenant: nvidia, site: NVIDIAExternalCareerSite } }
   - { name: CrowdStrike, ats: workday, id: { host: crowdstrike.wd5, tenant: crowdstrike, site: crowdstrikecareers } }
+  # curated big-tech Workday boards (verified live 2026-07-20):
+  - { name: Adobe, ats: workday, id: { host: adobe.wd5, tenant: adobe, site: external_experienced } }
+  - { name: Autodesk, ats: workday, id: { host: autodesk.wd1, tenant: autodesk, site: ext } }
+  - { name: eBay, ats: workday, id: { host: ebay.wd5, tenant: ebay, site: apply } }
+  - { name: Workday, ats: workday, id: { host: workday.wd5, tenant: workday, site: workday } }
+  - { name: HPE, ats: workday, id: { host: hpe.wd5, tenant: hpe, site: jobsathpe } }
+  - { name: Dell, ats: workday, id: { host: dell.wd1, tenant: dell, site: external } }
+  - { name: Mastercard, ats: workday, id: { host: mastercard.wd1, tenant: mastercard, site: corporatecareers } }
+  - { name: Micron, ats: workday, id: { host: micron.wd1, tenant: micron, site: external } }
+  - { name: Applied Materials, ats: workday, id: { host: amat.wd1, tenant: amat, site: external } }
+  - { name: Vanguard, ats: workday, id: { host: vanguard.wd5, tenant: vanguard, site: vanguard_external } }
+  - { name: Comcast, ats: workday, id: { host: comcast.wd5, tenant: comcast, site: comcast_careers } }
+  - { name: Target, ats: workday, id: { host: target.wd5, tenant: target, site: targetcareers } }
+  - { name: T-Mobile, ats: workday, id: { host: tmobile.wd1, tenant: tmobile, site: external } }
 
 # ─────────────── Parked: need a Collector / correct config we don't have yet ───────────────
 # Kept here so we don't lose them; move into `companies:` when ready.

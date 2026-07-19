@@ -12,8 +12,7 @@ import html
 import re
 from typing import Iterator
 
-import httpx
-
+from jobtracker.collectors._http import get_json
 from jobtracker.models import JobPosting
 
 _JOBS_URL = "https://boards-api.greenhouse.io/v1/boards/{token}/jobs"
@@ -39,19 +38,16 @@ class GreenhouseCollector:
                 print(f"  [error] greenhouse:{token}: {exc}")
 
 
-def fetch_board(token: str, timeout: float = 60.0) -> list[JobPosting]:
+def fetch_board(token: str, timeout: float = 30.0) -> list[JobPosting]:
     """Fetch one board's jobs WITH descriptions (?content=true).
 
-    Returns [] if the token is invalid (404) or has no jobs. Raises on other
-    HTTP/network errors so the caller can decide how to handle them.
+    Returns [] if the token is invalid (404) or has no jobs. Retries transient
+    failures (see _http.get_json); raises only if every attempt fails.
     """
-    resp = httpx.get(
-        _JOBS_URL.format(token=token), params={"content": "true"}, timeout=timeout
-    )
-    if resp.status_code == 404:
+    data = get_json(_JOBS_URL.format(token=token), params={"content": "true"}, timeout=timeout)
+    if data is None:
         return []
-    resp.raise_for_status()
-    return [_normalize(token, job) for job in resp.json().get("jobs", [])]
+    return [_normalize(token, job) for job in data.get("jobs", [])]
 
 
 def _normalize(token: str, job: dict) -> JobPosting:

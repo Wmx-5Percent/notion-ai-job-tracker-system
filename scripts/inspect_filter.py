@@ -24,7 +24,7 @@ def main() -> None:
     dropped_offcycle = 0
     kept_samples = []
 
-    for token in load_companies().get("greenhouse", []):
+    for token in [c["id"] for c in load_companies() if c.get("ats") == "greenhouse"]:
         try:
             jobs = greenhouse.fetch_board(token)
         except Exception as exc:  # noqa: BLE001

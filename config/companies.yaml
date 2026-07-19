@@ -1,111 +1,142 @@
-# Greenhouse board tokens (boards-api.greenhouse.io/v1/boards/<token>/jobs).
-# The collector validates these live; invalid/empty ones are skipped automatically.
-# This is a seed list — grow it over time (coverage = how many companies are here).
-greenhouse:
-  # Existing seed companies
-  - anthropic
-  - databricks
-  - discord
-  - figma
-  - coinbase
-  - robinhood
-  - instacart
-  - brex
-  - gusto
-  - samsara
-  - affirm
-  - cloudflare
-  - gitlab
-  - reddit
-  - pinterest
-  - dropbox
+# Company Registry — one row per company board.
+# `ats` selects the Collector (see jobtracker/collectors/registry.py); `id` is how
+# that ATS identifies the board:
+#   greenhouse / ashby / lever : a single slug (string)
+#   workday / official         : a small mapping (added when those collectors land)
+#
+# POLICY: keep a company even if a pull returns nothing or errors — it may be a
+# transient timeout or a slug that differs from the name (e.g. DoorDash =
+# "doordashusa"). The run skips a dead/empty board and moves on; never auto-prune.
 
-  # Frontier AI / applied AI / ML
-  - scaleai
-  - deepmind
-  - c3iot
-  - togetherai
-  - xairatherapeutics
+companies:
+  # ─────────────── Greenhouse (boards-api.greenhouse.io/v1/boards/<id>/jobs) ───────────────
+  - { name: Anthropic, ats: greenhouse, id: anthropic }
+  - { name: Databricks, ats: greenhouse, id: databricks }
+  - { name: Discord, ats: greenhouse, id: discord }
+  - { name: Figma, ats: greenhouse, id: figma }
+  - { name: Coinbase, ats: greenhouse, id: coinbase }
+  - { name: Robinhood, ats: greenhouse, id: robinhood }
+  - { name: Instacart, ats: greenhouse, id: instacart }
+  - { name: Brex, ats: greenhouse, id: brex }
+  - { name: Gusto, ats: greenhouse, id: gusto }
+  - { name: Samsara, ats: greenhouse, id: samsara }
+  - { name: Affirm, ats: greenhouse, id: affirm }
+  - { name: Cloudflare, ats: greenhouse, id: cloudflare }
+  - { name: GitLab, ats: greenhouse, id: gitlab }
+  - { name: Reddit, ats: greenhouse, id: reddit }
+  - { name: Pinterest, ats: greenhouse, id: pinterest }
+  - { name: Dropbox, ats: greenhouse, id: dropbox }
+  - { name: Scale AI, ats: greenhouse, id: scaleai }
+  - { name: Google DeepMind, ats: greenhouse, id: deepmind }
+  - { name: C3 AI, ats: greenhouse, id: c3iot }
+  - { name: Together AI, ats: greenhouse, id: togetherai }
+  - { name: Xaira Therapeutics, ats: greenhouse, id: xairatherapeutics }
+  - { name: Datadog, ats: greenhouse, id: datadog }
+  - { name: Vercel, ats: greenhouse, id: vercel }
+  - { name: Neo4j, ats: greenhouse, id: neo4j }
+  - { name: WEKA, ats: greenhouse, id: wekatest }
+  - { name: ZoomInfo, ats: greenhouse, id: zoominfo }
+  - { name: Gruve, ats: greenhouse, id: gruve }
+  - { name: Via, ats: greenhouse, id: via }
+  - { name: Chime, ats: greenhouse, id: chime }
+  - { name: Flexport, ats: greenhouse, id: flexport }
+  - { name: Charlie Health, ats: greenhouse, id: charliehealth }
+  - { name: Kargo, ats: greenhouse, id: kargo22 }
+  - { name: DoorDash, ats: greenhouse, id: doordashusa }
+  - { name: Duolingo, ats: greenhouse, id: duolingounirecruitment }
+  - { name: Optiver, ats: greenhouse, id: optiverus }
+  - { name: Glean, ats: greenhouse, id: gleanwork }
+  - { name: SambaNova, ats: greenhouse, id: sambanovasystems }
+  - { name: MongoDB, ats: greenhouse, id: mongodb }
+  - { name: Elastic, ats: greenhouse, id: elastic }
+  - { name: CockroachDB, ats: greenhouse, id: cockroachlabs }
+  - { name: dbt Labs, ats: greenhouse, id: dbtlabsinc }
+  - { name: Fivetran, ats: greenhouse, id: fivetran }
+  - { name: Sourcegraph, ats: greenhouse, id: sourcegraph91 }
+  - { name: Temporal, ats: greenhouse, id: temporaltechnologies }
+  - { name: Grafana Labs, ats: greenhouse, id: grafanalabs }
+  - { name: Nuro, ats: greenhouse, id: nuro }
+  - { name: Zipline, ats: greenhouse, id: flyzipline }
+  - { name: Stripe, ats: greenhouse, id: stripe }
+  - { name: Airbnb, ats: greenhouse, id: airbnb }
+  - { name: Lyft, ats: greenhouse, id: lyft }
+  - { name: Marqeta, ats: greenhouse, id: marqeta }
+  - { name: Faire, ats: greenhouse, id: faire }
+  - { name: Nextdoor, ats: greenhouse, id: nextdoor }
+  - { name: Wiz, ats: greenhouse, id: wizinc }
+  - { name: Abnormal Security, ats: greenhouse, id: abnormalsecurity }
 
-  # AI infrastructure / data / developer platforms
-  - datadog
-  - vercel
-  - neo4j
-  - wekatest
-  - zoominfo
-  - gruve
+  # ─────────────── Ashby (api.ashbyhq.com/posting-api/job-board/<id>) ───────────────
+  - { name: Cohere, ats: ashby, id: cohere }
+  - { name: Perplexity, ats: ashby, id: perplexity }
+  - { name: Harvey, ats: ashby, id: harvey }
+  - { name: Sierra, ats: ashby, id: sierra }
+  - { name: Writer, ats: ashby, id: writer }
+  - { name: Crusoe, ats: ashby, id: crusoe }
+  - { name: ElevenLabs, ats: ashby, id: elevenlabs }
+  - { name: ClickHouse, ats: ashby, id: clickhouse }
+  - { name: Notion, ats: ashby, id: notion }
+  - { name: Ramp, ats: ashby, id: ramp }
+  - { name: Cursor, ats: ashby, id: cursor }
+  - { name: Plaid, ats: ashby, id: plaid }
+  - { name: Decagon, ats: ashby, id: decagon }
+  - { name: Vanta, ats: ashby, id: vanta }
+  - { name: LangChain, ats: ashby, id: langchain }
+  - { name: Replit, ats: ashby, id: replit }
+  - { name: Baseten, ats: ashby, id: baseten }
+  - { name: Suno, ats: ashby, id: suno }
+  - { name: Drata, ats: ashby, id: drata }
+  - { name: Supabase, ats: ashby, id: supabase }
+  - { name: Sentry, ats: ashby, id: sentry }
+  - { name: Amplitude, ats: ashby, id: amplitude }
+  - { name: Miro, ats: ashby, id: miro }
+  - { name: Modal, ats: ashby, id: modal }
+  - { name: Render, ats: ashby, id: render }
+  - { name: Physical Intelligence, ats: ashby, id: physicalintelligence }
+  - { name: Linear, ats: ashby, id: linear }
+  - { name: Semgrep, ats: ashby, id: semgrep }
+  - { name: Warp, ats: ashby, id: warp }
+  - { name: PostHog, ats: ashby, id: posthog }
+  - { name: Secureframe, ats: ashby, id: secureframe }
+  - { name: Column, ats: ashby, id: column }
+  - { name: Zapier, ats: ashby, id: zapier }
+  - { name: Character.AI, ats: ashby, id: character }
+  - { name: Poolside, ats: ashby, id: poolside }
+  - { name: Pika, ats: ashby, id: pika }
+  - { name: Railway, ats: ashby, id: railway }
+  - { name: Browserbase, ats: ashby, id: browserbase }
+  - { name: Material Security, ats: ashby, id: material }
+  - { name: Unit, ats: ashby, id: unit }
+  - { name: Modern Treasury, ats: ashby, id: moderntreasury }
+  - { name: Oso, ats: ashby, id: oso }
+  - { name: Neon, ats: ashby, id: neon }
+  - { name: Prefect, ats: ashby, id: prefect }
+  - { name: Pinecone, ats: ashby, id: pinecone }
+  - { name: Weaviate, ats: ashby, id: weaviate }
+  # valid Ashby board, no open roles right now (kept):
+  - { name: Airtable, ats: ashby, id: airtable }
+  - { name: Deel, ats: ashby, id: deel }
+  - { name: Figure, ats: ashby, id: figure }
+  - { name: Hex, ats: ashby, id: hex }
+  - { name: LaunchDarkly, ats: ashby, id: launchdarkly }
+  - { name: Loom, ats: ashby, id: loom }
+  - { name: Mercury, ats: ashby, id: mercury }
+  - { name: Raycast, ats: ashby, id: raycast }
+  - { name: Snyk, ats: ashby, id: snyk }
+  - { name: Verkada, ats: ashby, id: verkada }
+  - { name: Webflow, ats: ashby, id: webflow }
+  # on Ashby per research but the slug still needs confirming (kept; skipped until fixed):
+  - { name: Contextual AI, ats: ashby, id: contextual }
+  - { name: Confluent, ats: ashby, id: confluent }
+  - { name: Cruise, ats: ashby, id: cruise }
+  - { name: Aurora, ats: ashby, id: aurora }
+  - { name: Whatnot, ats: ashby, id: whatnot }
+  - { name: Rippling, ats: ashby, id: rippling }
 
-  # Autonomous systems / robotics / physical AI
-  # Defense contractors skipped: clearance / US-citizenship requirements make them
-  # a dead end for an international student (and Anduril is a huge ~2165-job board).
-  # - andurilindustries   # Anduril (defense)
-  - via
-
-  # FinTech / marketplaces / high-scale software
-  - chime
-  - flexport
-  - charliehealth
-  - kargo22
-  - doordashusa   # DoorDash (Greenhouse token is "doordashusa", not "doordash")
-
-  # Early-career / internship-specific boards
-  - duolingounirecruitment
-
-  # Quant / trading firms with Greenhouse-hosted or Greenhouse-backed job flows
-  - optiverus
-
-  # Candidate batch (added 2026-07-18; validated live, 404s pruned)
-  - cohere
-  - perplexityai
-  - gleanwork
-  - harvey
-  - sierra
-  - writer
-  - contextualai
-  - cerebras
-  - groq
-  - sambanovasystems
-  - snowflake
-  - confluent
-  - mongodb
-  - elastic
-  - cockroachlabs
-  - hashicorp
-  - dbtlabsinc
-  - fivetran
-  - sourcegraph91
-  - temporaltechnologies
-  - grafanalabs
-  - cruise
-  - nuro
-  - auroraoperations
-  # - skydio      # defense / dual-use (clearance) -> skip
-  # - shieldai    # Shield AI (defense) -> skip
-  - flyzipline
-  - stripe
-  - airbnb
-  - lyft
-  - marqeta
-  - mercury
-  - faire
-  - whatnot
-  - rippling
-  - deel
-  - nextdoor
-  - crowdstrike
-  - snyk
-  - wizinc
-  - abnormalsecurity
-
-# Corrected Greenhouse tokens (token != company name; verified live 2026-07-18):
-#   doordash->doordashusa, sourcegraph->sourcegraph91, dbtlabs->dbtlabsinc,
-#   glean->gleanwork, zipline->flyzipline, wiz->wizinc.
-# Still in the list below but NOT on Greenhouse (need an Ashby/Lever/Workday collector; a
-# token fix will NOT help) -> auto-skipped for now:
-#   cohere, perplexityai, harvey, sierra, writer, contextualai, confluent, deel, cruise,
-#   auroraoperations, skydio, shieldai, whatnot, rippling (Ashby); crowdstrike (Workday);
-#   snowflake, cerebras, groq, snyk, hashicorp (official/other).
-# Off-Greenhouse, not listed: ramp, plaid, benchling, runwayml, genies, appliedintuition, hudsonrivertrading.
-# Valid board, 0 open jobs now (kept): duolingounirecruitment, dbtlabsinc.
-# Defense contractors intentionally removed (clearance / citizenship bar an intl student):
-#   andurilindustries (Anduril; also a huge ~2165-job board), shieldai (Shield AI), skydio.
+# ─────────────── Parked: need a Collector we haven't built yet ───────────────
+# Kept here so we don't lose them; move into `companies:` when the collector lands.
+#   Workday : CrowdStrike
+#   ATS TBD (official careers site / other): Snowflake, Cerebras, Groq, HashiCorp
+#
+# Defense contractors intentionally removed (clearance / US-citizenship bar an intl
+# student): Anduril (also a huge ~2165-job board), Shield AI, Skydio.

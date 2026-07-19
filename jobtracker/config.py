@@ -56,8 +56,13 @@ def get_data_source_id(notion: Client, database_id: str) -> str:
     return sources[0]["id"]
 
 
-def load_companies() -> dict:
-    """Load config/companies.yaml -> {source: [board tokens]}."""
+def load_companies() -> list[dict]:
+    """Load the company registry -> list of {name, ats, id} records.
+
+    See config/companies.yaml. `id` is a slug (str) for greenhouse / ashby / lever,
+    or a small mapping for workday / official.
+    """
     path = _ROOT / "config" / "companies.yaml"
     with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+        data = yaml.safe_load(f) or {}
+    return data.get("companies", [])

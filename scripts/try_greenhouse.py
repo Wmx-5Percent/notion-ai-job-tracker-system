@@ -16,7 +16,7 @@ from jobtracker.config import load_companies
 
 
 def main() -> None:
-    tokens = load_companies().get("greenhouse", [])
+    tokens = [c["id"] for c in load_companies() if c.get("ats") == "greenhouse"]
     print(f"Greenhouse tokens to check: {len(tokens)}\n")
 
     valid, invalid, total = [], [], 0

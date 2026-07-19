@@ -258,6 +258,19 @@ companies:
   - { name: Labelbox, ats: lever, id: labelbox }
   - { name: Mistral AI, ats: lever, id: mistral }
   - { name: Wealthsimple, ats: lever, id: wealthsimple }
+  # discovered live 2026-07-19 (defense excluded: Shield AI, Palantir, Saronic):
+  - { name: Included Health, ats: lever, id: includedhealth }
+  - { name: SonarSource, ats: lever, id: sonarsource }
+  - { name: Ro, ats: lever, id: ro }
+  - { name: Outreach, ats: lever, id: outreach }
+  - { name: Rover, ats: lever, id: rover }
+  - { name: Kabam, ats: lever, id: kabam }
+  - { name: Wealthfront, ats: lever, id: wealthfront }
+  - { name: Jam City, ats: lever, id: jamcity }
+  - { name: Houzz, ats: lever, id: houzz }
+  - { name: Carbon Health, ats: lever, id: carbonhealth }
+  - { name: Medium, ats: lever, id: medium }
+  - { name: Playco, ats: lever, id: playco }
 
   # ─────────────── Workday (POST cxs API; title-only, the row links out for the JD) ───────────────
   - { name: NVIDIA, ats: workday, id: { host: nvidia.wd5, tenant: nvidia, site: NVIDIAExternalCareerSite } }

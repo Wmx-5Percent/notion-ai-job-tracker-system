@@ -259,10 +259,11 @@ companies:
   - { name: Mistral AI, ats: lever, id: mistral }
   - { name: Wealthsimple, ats: lever, id: wealthsimple }
 
-# ─────────────── Parked: need a Collector we haven't built yet ───────────────
-# Kept here so we don't lose them; move into `companies:` when the collector lands.
-#   Workday : CrowdStrike
+  # ─────────────── Workday (POST cxs API; title-only, the row links out for the JD) ───────────────
+  - { name: NVIDIA, ats: workday, id: { host: nvidia.wd5, tenant: nvidia, site: NVIDIAExternalCareerSite } }
+  - { name: CrowdStrike, ats: workday, id: { host: crowdstrike.wd5, tenant: crowdstrike, site: crowdstrikecareers } }
+
+# ─────────────── Parked: need a Collector / correct config we don't have yet ───────────────
+# Kept here so we don't lose them; move into `companies:` when ready.
 #   ATS TBD (official careers site / other): Snowflake, Cerebras, Groq, HashiCorp
-#
-# Defense contractors intentionally removed (clearance / US-citizenship bar an intl
-# student): Anduril (also a huge ~2165-job board), Shield AI, Skydio.
+#   Defense (excluded): Anduril, Shield AI (on Lever), Skydio.

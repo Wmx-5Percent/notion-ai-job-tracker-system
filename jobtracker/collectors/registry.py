@@ -12,6 +12,7 @@ from jobtracker.collectors.ashby import AshbyCollector
 from jobtracker.collectors.base import Collector
 from jobtracker.collectors.greenhouse import GreenhouseCollector
 from jobtracker.collectors.lever import LeverCollector
+from jobtracker.collectors.workday import WorkdayCollector
 from jobtracker.config import load_companies
 
 # ats name -> Collector adapter. Each adapter takes the list of `id`s for its ATS.
@@ -19,7 +20,7 @@ _FACTORIES = {
     "greenhouse": GreenhouseCollector,
     "ashby": AshbyCollector,
     "lever": LeverCollector,
-    # "workday": WorkdayCollector,    # structured id: {tenant, site}
+    "workday": WorkdayCollector,
     # "official": OfficialCollector,  # structured id: {url, ...} (web crawler)
 }
 

@@ -100,6 +100,16 @@ _NON_US = re.compile(
     r")\b",
     re.I,
 )
+
+# Non-US ISO 3166-1 alpha-3 country codes. Workday writes locations like
+# "Quebec, CAN - Remote" / "London, GBR" / "Bengaluru, IND", which the full-name
+# _NON_US list above misses. Matched case-sensitively (uppercase) so it never
+# hits English words like "can" or "are"; "USA" is the US and is excluded.
+_NON_US_ISO3 = re.compile(
+    r"\b(?:CAN|GBR|DEU|FRA|ESP|ITA|NLD|IRL|CHE|SWE|NOR|DNK|FIN|POL|PRT|AUT|BEL|"
+    r"CZE|ROU|HUN|GRC|IND|CHN|JPN|KOR|SGP|AUS|NZL|ISR|TUR|ARE|EGY|BRA|MEX|ARG|"
+    r"COL|CHL|ZAF|PHL|MYS|THA|VNM|IDN|TWN|HKG)\b"
+)
 _US_STATES = (
     "AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO "
     "MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY DC"
@@ -188,7 +198,11 @@ def is_us_or_remote(location: str) -> bool:
     loc = location or ""
     if _US_TEXT.search(loc) or _US_STATE.search(loc) or _US_STATE_NAME.search(loc):
         return True
-    return bool(_REMOTE.search(loc) and not _NON_US.search(loc))
+    return bool(
+        _REMOTE.search(loc)
+        and not _NON_US.search(loc)
+        and not _NON_US_ISO3.search(loc)
+    )
 
 
 def classify_track(title: str) -> str | None:

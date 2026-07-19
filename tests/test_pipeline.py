@@ -132,6 +132,24 @@ def test_one_failing_source_does_not_stop_the_rest():
     assert written[0]["source"] == "greenhouse"
 
 
+def test_non_us_iso3_remote_is_filtered():
+    # Workday writes ISO3 country codes, e.g. "Quebec, CAN - Remote" (non-US) vs
+    # "Remote, US". Only the US remote role should survive the location filter.
+    collectors = [
+        FakeCollector(
+            "workday",
+            [
+                _job("workday", "10", "Software Engineer Intern", "Quebec, CAN - Remote"),
+                _job("workday", "11", "Software Engineer Intern", "Remote, US"),
+            ],
+        )
+    ]
+    written = []
+    result = pipeline.collect(collectors, set(), written.append)
+    assert result.created == 1, result
+    assert [j["external_job_id"] for j in written] == ["11"]
+
+
 def _run():
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for fn in tests:

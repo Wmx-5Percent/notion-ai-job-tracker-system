@@ -150,6 +150,37 @@ def test_non_us_iso3_remote_is_filtered():
     assert [j["external_job_id"] for j in written] == ["11"]
 
 
+def test_intern_facet_picks_best_dimension():
+    # Workday facet ids are tenant-specific; the picker matches on value
+    # descriptors and prefers the employment-type facet covering the most roles.
+    from jobtracker.collectors.workday import _pick_intern_facet
+
+    facets = [
+        {"facetParameter": "timeType", "values": [
+            {"id": "ft", "descriptor": "Full time", "count": 2546}]},
+        {"facetParameter": "workerSubType", "values": [
+            {"id": "i1", "descriptor": "Intern - Regular (Fixed Term)", "count": 43},
+            {"id": "i2", "descriptor": "Intern - Trainee (Fixed Term)", "count": 1},
+            {"id": "reg", "descriptor": "Regular", "count": 2746}]},
+        {"facetParameter": "jobFamilyGroup", "values": [
+            {"id": "jf", "descriptor": "Interns", "count": 44},
+            {"id": "eng", "descriptor": "Engineer-ProdRelated", "count": 1822}]},
+    ]
+    result = _pick_intern_facet(facets)
+    assert result is not None
+    param, ids = result
+    assert param == "workerSubType", param
+    assert set(ids) == {"i1", "i2"}, ids
+
+
+def test_no_intern_facet_returns_none():
+    from jobtracker.collectors.workday import _pick_intern_facet
+
+    facets = [{"facetParameter": "timeType",
+               "values": [{"id": "ft", "descriptor": "Full time", "count": 10}]}]
+    assert _pick_intern_facet(facets) is None
+
+
 def _run():
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for fn in tests:

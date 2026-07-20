@@ -1,0 +1,46 @@
+name: Daily job scan
+
+# Poll every configured ATS and write new postings to Notion. Scheduled runs
+# target the SANDBOX DB (python main.py); flip to --prod after the prod Notion
+# is migrated (see docs/notion-schema.md / ADR-0005). Manual runs can pick.
+on:
+  schedule:
+    - cron: "0 13 * * *" # 13:00 UTC (~6am US Pacific)
+    - cron: "0 1 * * *" # 01:00 UTC (~6pm US Pacific)
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Notion DB to write"
+        type: choice
+        default: sandbox
+        options: [sandbox, prod]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: job-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scan
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          NOTION_SANDBOX_DATABASE_ID: ${{ secrets.NOTION_SANDBOX_DATABASE_ID }}
+        # Scheduled runs -> sandbox. Manual dispatch may choose prod.
+        run: python main.py ${{ (github.event_name == 'workflow_dispatch' && inputs.target == 'prod') && '--prod' || '' }}

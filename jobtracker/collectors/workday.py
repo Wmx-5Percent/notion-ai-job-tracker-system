@@ -33,6 +33,10 @@ _INTERN_FACET = re.compile(
     re.I,
 )
 
+# Workday shows a multi-site posting's location as "N Locations" (no cities); when
+# we see that we fetch the job detail to recover the real location(s) + country.
+_MULTI_LOC = re.compile(r"^\s*\d+\s+locations?\s*$", re.I)
+
 
 class WorkdayCollector:
     """Collector adapter for company Workday CXS job boards."""
@@ -92,6 +96,36 @@ def _pick_intern_facet(facets: list[dict]):
     return best, by_param[best]["ids"]
 
 
+def _location_from_detail(info: dict) -> str:
+    """Build a location string from a Workday job-detail ``jobPostingInfo``:
+    primary location + any additional locations + the country descriptor."""
+    parts: list[str] = []
+    if info.get("location"):
+        parts.append(info["location"])
+    parts.extend(info.get("additionalLocations") or [])
+    country = (info.get("country") or {}).get("descriptor")
+    if country:
+        parts.append(country)
+    return ", ".join(parts)
+
+
+def _resolve_location(base: str, posting: dict, timeout: float) -> str:
+    """Return a filter-usable location. For a "N Locations" aggregate posting,
+    fetch the job detail to recover the real cities + country; otherwise return
+    the listing's ``locationsText`` unchanged."""
+    text = (posting.get("locationsText") or "").strip()
+    if not _MULTI_LOC.search(text):
+        return text
+    try:
+        resp = httpx.get(f"{base}{posting.get('externalPath') or ''}", headers=_HEADERS, timeout=timeout)
+        if resp.status_code != 200:
+            return text
+        info = (resp.json() or {}).get("jobPostingInfo") or {}
+    except Exception:  # noqa: BLE001 - detail is best-effort; fall back to the aggregate
+        return text
+    return _location_from_detail(info) or text
+
+
 def fetch_board(cfg: dict, timeout: float = 30.0) -> Iterator[JobPosting]:
     """Yield a company's intern postings (title-only) via Workday's CXS API.
 
@@ -115,6 +149,7 @@ def fetch_board(cfg: dict, timeout: float = 30.0) -> Iterator[JobPosting]:
         if not postings:
             return
         for p in postings:
+            p["locationsText"] = _resolve_location(base, p, timeout)
             yield _normalize(cfg, base, p)
         offset += _PAGE
         if offset >= (data.get("total") or 0):

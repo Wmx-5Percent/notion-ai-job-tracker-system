@@ -181,6 +181,29 @@ def test_no_intern_facet_returns_none():
     assert _pick_intern_facet(facets) is None
 
 
+def test_workday_multi_location_detail_resolves_to_us():
+    # A "N Locations" Workday posting is enriched from its job detail so the US
+    # filter can see the real cities + country.
+    from jobtracker import filtering
+    from jobtracker.collectors.workday import _MULTI_LOC, _location_from_detail
+
+    assert _MULTI_LOC.search("3 Locations") and not _MULTI_LOC.search("San Jose, CA")
+    us = _location_from_detail({
+        "location": "San Jose",
+        "additionalLocations": ["Seattle", "San Francisco"],
+        "country": {"descriptor": "United States of America"},
+    })
+    assert "United States of America" in us
+    assert filtering.is_us_or_remote(us) is True
+
+    non_us = _location_from_detail({
+        "location": "London",
+        "additionalLocations": ["Dublin"],
+        "country": {"descriptor": "United Kingdom"},
+    })
+    assert filtering.is_us_or_remote(non_us) is False
+
+
 def _run():
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for fn in tests:

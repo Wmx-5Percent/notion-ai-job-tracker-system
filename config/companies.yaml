@@ -290,6 +290,13 @@ companies:
   - { name: Comcast, ats: workday, id: { host: comcast.wd5, tenant: comcast, site: comcast_careers } }
   - { name: Target, ats: workday, id: { host: target.wd5, tenant: target, site: targetcareers } }
   - { name: T-Mobile, ats: workday, id: { host: tmobile.wd1, tenant: tmobile, site: external } }
+  # more curated Workday boards (verified live 2026-07-20, batch 2):
+  - { name: Analog Devices, ats: workday, id: { host: analogdevices.wd1, tenant: analogdevices, site: external } }
+  - { name: NXP, ats: workday, id: { host: nxp.wd3, tenant: nxp, site: careers } }
+  - { name: Cadence, ats: workday, id: { host: cadence.wd1, tenant: cadence, site: External_Careers } }
+  - { name: Marvell, ats: workday, id: { host: marvell.wd1, tenant: marvell, site: MarvellCareers2 } }
+  - { name: Nordstrom, ats: workday, id: { host: nordstrom.wd501, tenant: nordstrom, site: nordstrom_careers } }
+  - { name: Chewy, ats: workday, id: { host: chewy.wd5, tenant: chewy, site: external } }
 
 # ─────────────── Parked: need a Collector / correct config we don't have yet ───────────────
 # Kept here so we don't lose them; move into `companies:` when ready.

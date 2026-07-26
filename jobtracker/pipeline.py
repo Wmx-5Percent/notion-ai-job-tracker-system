@@ -48,10 +48,18 @@ def collect(
     for collector in collectors:
         try:
             jobs: Iterable[JobPosting] = collector.fetch_jobs()
+            iterator = iter(jobs)
         except Exception as exc:  # noqa: BLE001 - one Source must not stop the rest
             print(f"  [error] source {getattr(collector, 'source', '?')}: {exc}")
             continue
-        for job in jobs:
+        while True:
+            try:
+                job = next(iterator)
+            except StopIteration:
+                break
+            except Exception as exc:  # noqa: BLE001 - isolate lazy iterator failures
+                print(f"  [error] source {getattr(collector, 'source', '?')}: {exc}")
+                break
             scanned += 1
             track = filtering.match(job)
             if not track:

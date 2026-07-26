@@ -16,8 +16,6 @@ Workday is unlike Greenhouse/Ashby/Lever:
 import re
 from typing import Iterator
 
-import httpx
-
 from jobtracker.models import JobPosting
 
 _CXS = "https://{host}.myworkdayjobs.com/wday/cxs/{tenant}/{site}"
@@ -56,6 +54,8 @@ class WorkdayCollector:
 
 def _post_jobs(base: str, applied_facets: dict, search: str, offset: int, timeout: float):
     """POST one page of the CXS jobs search; return the JSON dict (None on 404)."""
+    import httpx
+
     resp = httpx.post(
         f"{base}/jobs",
         json={"appliedFacets": applied_facets, "limit": _PAGE, "offset": offset, "searchText": search},
@@ -117,6 +117,8 @@ def _resolve_location(base: str, posting: dict, timeout: float) -> str:
     if not _MULTI_LOC.search(text):
         return text
     try:
+        import httpx
+
         resp = httpx.get(f"{base}{posting.get('externalPath') or ''}", headers=_HEADERS, timeout=timeout)
         if resp.status_code != 200:
             return text

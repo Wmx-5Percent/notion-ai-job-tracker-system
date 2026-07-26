@@ -5,7 +5,16 @@
 writer, so producers and consumers share one definition without coupling.
 """
 
-from typing import NotRequired, TypedDict
+from typing import Literal, NotRequired, TypedDict
+
+JobKind = Literal["Internship", "Co-op", "New Grad", "Early Career", "Other"]
+DiscoveryMethod = Literal[
+    "api",
+    "rss",
+    "public_page",
+    "websearch",
+    "manual_submission",
+]
 
 
 class JobPosting(TypedDict):
@@ -25,3 +34,9 @@ class JobPosting(TypedDict):
     job_description: str
     track: NotRequired[str]
     status: NotRequired[str]
+    job_kind: NotRequired[JobKind | None]
+    deadline: NotRequired[str | None]
+    canonical_job_key: NotRequired[str | None]
+    discovery_method: NotRequired[DiscoveryMethod | None]
+    evidence_url: NotRequired[str | None]
+    fetched_at: NotRequired[str | None]

@@ -1,8 +1,8 @@
-"""High-recall filtering + rough Track classification for Job Postings (ADR-0004).
+"""Shared eligibility, personal eligibility, and Track classification.
 
-Goal: catch every plausible US (or Remote) internship / student / early-career
-role in our target fields, and drop clear full-time, senior, or off-field noise.
-Recall first; leftover noise is triaged with `Skip` in Notion.
+Shared eligibility catches plausible US (or Remote) CS internship / new-grad
+roles. Personal degree and season restrictions are evaluated separately so one
+candidate's constraints can never remove a posting from the shared pool.
 
 The recall gate reads the title (broad intern/student words) and the JD (only
 strict phrases like "currently pursuing a degree" / "which intern season"), so a
@@ -11,14 +11,14 @@ that merely mentions "interns" in passing leaking in. Rejects read the title onl
 """
 
 import re
+from dataclasses import dataclass
 
-from jobtracker.models import JobPosting
+from jobtracker.models import JobKind, JobPosting
 
 # Strong internship signal (title): intern / internship / co-op.
 _INTERN = re.compile(r"\b(interns?|internship|co-?op|coop)\b", re.I)
 
-# Broad early-career gate: strong intern signals + student / early-career words.
-# Matched against title + JD, so JD-only student roles are still caught.
+# Broad title gate: strong intern signals + student / early-career words.
 _EARLY_CAREER = re.compile(
     r"\b(interns?|internship|co-?op|coop)\b"
     r"|\bstudent\b|\buniversity\b|\bcampus\b"
@@ -26,6 +26,8 @@ _EARLY_CAREER = re.compile(
     r"|\bsummer\s+(analyst|associate|scholar)\b"
     r"|\bworking\s+student\b|\bstudent\s+worker\b"
     r"|\bearly[-\s]?career\b"
+    r"|\bentry[-\s]?level\b|\bnew\s+(college\s+)?grad(uate)?\b"
+    r"|\brecent\s+(college\s+)?graduate\b|\bgraduate\s+(program|programme|role)\b"
     r"|\b(ai|ml|research|data|software)\s+resident\b|\bresidency\b"
     r"|\bindustrial\s+placement\b|\bplacement\s+year\b",
     re.I,
@@ -44,19 +46,25 @@ _ELIGIBILITY = re.compile(
     re.I,
 )
 
-# Full-time / seniority markers (title only): not a Summer-2027 internship.
+# Seniority markers (title only).
 _SENIOR = re.compile(
     r"\bsenior\b|\bsr\.?\b|\bstaff\b|\bprincipal\b|\blead\b|\bmanager\b|\bdirector\b"
-    r"|\bvp\b|\bvice\s+president\b|\bhead\s+of\b|\bdistinguished\b|\bfellow\b"
-    r"|\bnew\s+(college\s+)?grad(uate)?\b|\brecent\s+(college\s+)?graduate\b",
+    r"|\bvp\b|\bvice\s+president\b|\bhead\s+of\b|\bdistinguished\b|\bfellow\b",
     re.I,
 )
 
-# "Graduate <role>" (e.g. "Graduate Software Engineer, 2027 start") is a new-grad
-# full-time program, not an internship. Reject bare "graduate" unless the title
-# also carries an intern / student / research word.
-_GRADUATE = re.compile(r"\bgraduate\b", re.I)
-_STUDENTISH = re.compile(r"\b(interns?|internship|co-?op|coop|student|research|ph\.?d)\b", re.I)
+_NEW_GRAD = re.compile(
+    r"\bnew\s+(college\s+)?grad(uate)?\b|\brecent\s+(college\s+)?graduate\b"
+    r"|\bgraduate\s+(software|data|machine|research|security|systems|engineer|developer|"
+    r"scientist|analyst|program|programme|role)\b",
+    re.I,
+)
+_EARLY_CAREER_KIND = re.compile(
+    r"\bearly[-\s]?career\b|\bentry[-\s]?level\b|\buniversity\s+(graduate|hire)\b"
+    r"|\bcampus\s+hire\b|\bapprentice(ship)?\b|\btrainee\b|\bresiden(cy|t)\b"
+    r"|\bstudent\s+(worker|program|role)\b",
+    re.I,
+)
 
 # Off-field role functions (title only). Only rejects when NO target-track
 # keyword is present, so "Data Analyst Intern, Finance" (a Data role) survives.
@@ -133,9 +141,30 @@ _TRACK_PATTERNS = [
     ("Data", r"data scientist|data analyst|data science|data analytics|business intelligence|analytics"),
     ("MLE", r"machine learning engineer|ml engineer|mlops"),
     ("AI/LLM", r"ai engineer|applied ai|applied scientist|\bllm\b|generative|genai|\bnlp\b|deep learning|artificial intelligence|research engineer|research scientist|machine learning"),
+    ("Security", r"security engineer|cybersecurity|information security|application security"),
+    ("Systems", r"systems engineer|distributed systems|site reliability|\bsre\b|infrastructure engineer"),
     ("SWE", r"software engineer|software development engineer|\bswe\b"),
 ]
 _TRACKS = [(name, re.compile(pat, re.I)) for name, pat in _TRACK_PATTERNS]
+
+
+@dataclass(frozen=True)
+class EligibilityResult:
+    """A pure eligibility decision with stable, machine-readable reasons."""
+
+    eligible: bool
+    reasons: tuple[str, ...] = ()
+    track: str | None = None
+    job_kind: JobKind | None = None
+
+
+@dataclass(frozen=True)
+class PersonalCriteria:
+    """Candidate-only restrictions; defaults do not narrow the shared pool."""
+
+    allowed_job_kinds: frozenset[JobKind] | None = None
+    allow_offcycle: bool = True
+    phd_eligible: bool = True
 
 
 def is_internship(title: str) -> bool:
@@ -161,15 +190,8 @@ def has_early_career_signal(title: str, jd: str = "") -> bool:
 
 
 def is_senior_or_fulltime(title: str) -> bool:
-    """Seniority / full-time markers that rule out a Summer-2027 internship.
-
-    Also rejects new-grad "graduate" programs (e.g. "Graduate Software Engineer,
-    2027 start") unless the title also carries an intern / student word.
-    """
-    t = title or ""
-    if _SENIOR.search(t):
-        return True
-    return bool(_GRADUATE.search(t) and not _STUDENTISH.search(t))
+    """Backward-compatible name for seniority markers."""
+    return bool(_SENIOR.search(title or ""))
 
 
 def is_off_field(title: str) -> bool:
@@ -213,28 +235,72 @@ def classify_track(title: str) -> str | None:
     return None
 
 
-def match(job: JobPosting) -> str | None:
-    """Return a Track if the job is a plausible US Summer-2027 early-career role
-    in our fields, else None.
+def classify_job_kind(title: str, jd: str = "") -> JobKind | None:
+    """Classify an explicit early-career kind without inferring from seniority."""
+    title = title or ""
+    if re.search(r"\b(co-?op|coop)\b", title, re.I):
+        return "Co-op"
+    if _INTERN.search(title):
+        return "Internship"
+    if _NEW_GRAD.search(title):
+        return "New Grad"
+    if _EARLY_CAREER_KIND.search(title):
+        return "Early Career"
+    if _ELIGIBILITY.search(title) or _ELIGIBILITY.search(jd or ""):
+        return "Internship"
+    if _EARLY_CAREER.search(title):
+        return "Early Career"
+    return None
 
-    High recall: the early-career gate reads title + job description, and an
-    in-field role we cannot classify is kept as `Other` for manual triage.
-    Rejects (senior / off-field / PhD-only / off-cycle) read the title only.
+
+def shared_eligibility(job: JobPosting) -> EligibilityResult:
+    """Evaluate only team-wide US/Remote CS early-career pool requirements.
+
+    Season, degree, visa, and candidate preferences deliberately do not appear
+    here. Unclassified but not clearly off-field roles are retained as ``Other``
+    for high-recall manual triage.
     """
     title = job.get("title", "")
     jd = job.get("job_description", "") or ""
 
     if not is_us_or_remote(job.get("location", "")):
-        return None
+        return EligibilityResult(False, ("outside_shared_geography",))
     if is_senior_or_fulltime(title):
-        return None
-    if is_phd_only(title):
-        return None
-    if is_offcycle(title):
-        return None
+        return EligibilityResult(False, ("senior_role",))
+    job_kind = job.get("job_kind") or classify_job_kind(title, jd)
+    if job_kind is None:
+        return EligibilityResult(False, ("not_early_career",))
     track = classify_track(title)
     if track is None and is_off_field(title):
-        return None
-    if not has_early_career_signal(title, jd):
-        return None
-    return track or "Other"
+        return EligibilityResult(False, ("outside_cs_scope",), job_kind=job_kind)
+    return EligibilityResult(True, track=track or "Other", job_kind=job_kind)
+
+
+def personal_eligibility(
+    job: JobPosting,
+    criteria: PersonalCriteria,
+) -> EligibilityResult:
+    """Apply one candidate's restrictions without changing shared eligibility."""
+    shared = shared_eligibility(job)
+    if not shared.eligible:
+        return shared
+
+    reasons: list[str] = []
+    if criteria.allowed_job_kinds is not None and shared.job_kind not in criteria.allowed_job_kinds:
+        reasons.append("job_kind_not_allowed")
+    if not criteria.allow_offcycle and is_offcycle(job.get("title", "")):
+        reasons.append("offcycle_for_candidate")
+    if not criteria.phd_eligible and is_phd_only(job.get("title", "")):
+        reasons.append("degree_requirement_not_met")
+    return EligibilityResult(
+        not reasons,
+        tuple(reasons),
+        track=shared.track,
+        job_kind=shared.job_kind,
+    )
+
+
+def match(job: JobPosting) -> str | None:
+    """Backward-compatible pipeline adapter returning only the shared Track."""
+    result = shared_eligibility(job)
+    return result.track if result.eligible else None

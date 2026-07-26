@@ -6,6 +6,7 @@ Or with pytest if installed:       .venv/bin/python -m pytest tests/
 """
 
 import sys
+import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -210,6 +211,16 @@ def _run():
         fn()
         print(f"ok  {fn.__name__}")
     print(f"\nall {len(tests)} pipeline tests passed")
+
+
+def load_tests(loader, tests, pattern):
+    """Expose the historical function tests to ``unittest discover``."""
+    del loader, tests, pattern
+    suite = unittest.TestSuite()
+    for name, fn in sorted(globals().items()):
+        if name.startswith("test_") and callable(fn):
+            suite.addTest(unittest.FunctionTestCase(fn, description=name))
+    return suite
 
 
 if __name__ == "__main__":

@@ -66,6 +66,11 @@ class UrlIdentityTests(unittest.TestCase):
         self.assertNotEqual(conservative_fingerprint(base), conservative_fingerprint(other_role))
         self.assertNotEqual(conservative_fingerprint(base), conservative_fingerprint(other_location))
 
+    def test_fingerprint_is_review_hint_not_canonical_key(self):
+        job = posting(url="")
+        self.assertIsNotNone(conservative_fingerprint(job))
+        self.assertIsNone(build_canonical_job_key(job))
+
     def test_incomplete_fingerprint_is_not_guessed(self):
         self.assertIsNone(conservative_fingerprint(posting(url="", location="")))
         self.assertIsNone(build_canonical_job_key(posting(url="", company="")))

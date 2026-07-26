@@ -87,11 +87,13 @@ def conservative_fingerprint(job: JobPosting) -> str | None:
 
 
 def build_canonical_job_key(job: JobPosting) -> str | None:
-    """Prefer a canonical apply URL; fall back to a conservative fingerprint."""
+    """Build a canonical key only when a normalized apply URL is available.
+
+    A company/title/location fingerprint is weaker evidence and must be consumed
+    separately as a review hint, never as an automatic-merge key.
+    """
     if canonical_url := canonicalize_url(job.get("url", "")):
         return f"url:{canonical_url}"
-    if fingerprint := conservative_fingerprint(job):
-        return f"fingerprint:{fingerprint}"
     return None
 
 

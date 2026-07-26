@@ -49,9 +49,8 @@ def _jd_to_blocks(job_description: str) -> list:
     return blocks
 
 
-def create_job_page(notion, data_source_id: str, job: JobPosting) -> dict:
-    """Create one job row. `job` supports keys: title (required), company, status,
-    url, source, external_job_id, location, posted_date, track, job_description."""
+def build_job_properties(job: JobPosting) -> dict:
+    """Build the legacy Notion property payload without performing I/O."""
     properties: dict = {
         "Job Title": {"title": _rich_text(job["title"])},
     }
@@ -71,13 +70,20 @@ def create_job_page(notion, data_source_id: str, job: JobPosting) -> dict:
         properties["Posted Date"] = {"date": {"start": job["posted_date"]}}
     if track := job.get("track"):
         properties["Track"] = {"select": {"name": track}}
+    return properties
 
-    children = _jd_to_blocks(job["job_description"]) if job.get("job_description") else []
 
+def build_job_children(job: JobPosting) -> list:
+    """Build page-body blocks without performing I/O."""
+    return _jd_to_blocks(job["job_description"]) if job.get("job_description") else []
+
+
+def create_job_page(notion, data_source_id: str, job: JobPosting) -> dict:
+    """Create one job row from the independently testable payload builders."""
     return notion.pages.create(
         parent={"type": "data_source_id", "data_source_id": data_source_id},
-        properties=properties,
-        children=children,
+        properties=build_job_properties(job),
+        children=build_job_children(job),
     )
 
 

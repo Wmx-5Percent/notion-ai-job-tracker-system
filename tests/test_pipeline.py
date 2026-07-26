@@ -133,6 +133,37 @@ def test_one_failing_source_does_not_stop_the_rest():
     assert written[0]["source"] == "greenhouse"
 
 
+def test_lazy_source_failure_does_not_stop_the_rest():
+    class LazyBoomCollector:
+        source = "lazy-boom"
+
+        def fetch_jobs(self):
+            yield _job("lazy-boom", "1", "Software Engineer Intern")
+            raise RuntimeError("pagination failed")
+
+    collectors = [
+        LazyBoomCollector(),
+        FakeCollector("ashby", [_job("ashby", "2", "Data Science Intern")]),
+    ]
+    written = []
+    result = pipeline.collect(collectors, set(), written.append)
+    assert result.created == 2, result
+    assert [job["source"] for job in written] == ["lazy-boom", "ashby"]
+
+
+def test_duplicate_within_one_source_is_written_once():
+    duplicate = _job("greenhouse", "same", "Software Engineer Intern")
+    written = []
+    result = pipeline.collect(
+        [FakeCollector("greenhouse", [duplicate, dict(duplicate)])],
+        set(),
+        written.append,
+    )
+    assert result.created == 1, result
+    assert result.dup == 1, result
+    assert len(written) == 1
+
+
 def test_non_us_iso3_remote_is_filtered():
     # Workday writes ISO3 country codes, e.g. "Quebec, CAN - Remote" (non-US) vs
     # "Remote, US". Only the US remote role should survive the location filter.

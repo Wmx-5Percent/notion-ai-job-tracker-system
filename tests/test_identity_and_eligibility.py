@@ -44,20 +44,32 @@ class UrlIdentityTests(unittest.TestCase):
         self.assertIsNone(canonicalize_url("javascript:alert(1)"))
         self.assertIsNone(canonicalize_url("https://user:secret@example.com/job"))
 
-    def test_same_apply_url_has_same_key_across_sources(self):
+    def test_same_verified_official_url_has_same_key_across_sources(self):
         greenhouse = posting(
             source="greenhouse",
             url="https://jobs.example.com/apply/123?utm_campaign=summer",
         )
-        aggregator = posting(
+        discovered_elsewhere = posting(
             source="aggregator",
             external_job_id="different",
             url="https://JOBS.example.com:443/apply/123/#top",
         )
         self.assertEqual(
-            build_canonical_job_key(greenhouse),
-            build_canonical_job_key(aggregator),
+            build_canonical_job_key(greenhouse, official_url_verified=True),
+            build_canonical_job_key(discovered_elsewhere, official_url_verified=True),
         )
+
+    def test_unverified_official_aggregator_and_search_urls_never_form_keys(self):
+        urls = [
+            "https://jobs.example.com/apply/123",
+            "https://www.indeed.com/viewjob?jk=abc123",
+            "https://www.google.com/url?q=https%3A%2F%2Fjobs.example.com%2Fapply%2F123",
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                job = posting(source="aggregator", url=url)
+                self.assertIsNotNone(canonicalize_url(url))
+                self.assertIsNone(build_canonical_job_key(job))
 
     def test_fingerprint_does_not_merge_different_role_or_location(self):
         base = posting(url="")

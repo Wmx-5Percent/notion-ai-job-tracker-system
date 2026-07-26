@@ -86,12 +86,19 @@ def conservative_fingerprint(job: JobPosting) -> str | None:
     return hashlib.sha256(payload).hexdigest()
 
 
-def build_canonical_job_key(job: JobPosting) -> str | None:
-    """Build a canonical key only when a normalized apply URL is available.
+def build_canonical_job_key(
+    job: JobPosting,
+    *,
+    official_url_verified: bool = False,
+) -> str | None:
+    """Build a canonical key only from an explicitly verified official URL.
 
-    A company/title/location fingerprint is weaker evidence and must be consumed
-    separately as a review hint, never as an automatic-merge key.
+    URL syntax/canonicalization alone is not evidence that an aggregator, search
+    wrapper, or submitted URL identifies the official posting. Callers must
+    verify that boundary before opting in. Fingerprints remain review hints only.
     """
+    if not official_url_verified:
+        return None
     if canonical_url := canonicalize_url(job.get("url", "")):
         return f"url:{canonical_url}"
     return None
